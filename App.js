@@ -1,19 +1,27 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import 'react-native-gesture-handler';
+import React, { useState, useEffect, useContext } from 'react';
+import { StyleSheet, Text, View, Button, Modal, FlatList } from 'react-native';
+import { NavigationContainer} from '@react-navigation/native';
+import { AuthNavigator } from './src/navigation/AuthScreenNav';
+import { HomeNavigator } from './src/navigation/HomeScreenNav';
+import { AuthContext } from './src/screens/AuthContext';
+import { decode, encode} from 'base-64';
+
+if (!global.btoa) { global.btoa = encode }
+if (!global.atob) { global.atob = decode }
 
 export default function App() {
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-    </View>
+    <AuthContext.Provider value={setUser}> 
+      <NavigationContainer>
+        { !loading ? <></> : user ? (
+          <HomeNavigator />
+        ) : (
+          <AuthNavigator /> 
+        )}
+      </NavigationContainer>        
+    </AuthContext.Provider>
   );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+};
