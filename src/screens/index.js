@@ -1,4 +1,4 @@
-export { default as HomeScreen } from './HomeScreen/HomeScreen'
+export { default as Transcripts } from './Transcripts/Transcripts'
 export { default as LoginScreen } from './LoginScreen/LoginScreen'
 export { default as RecordScreen } from './RecordScreen/RecordScreen'
 export { default as RegisterScreen } from './RegisterScreen/RegisterScreen'

@@ -7,7 +7,7 @@ const firebaseConfig = {
   authDomain: 'wavely-1593222928316.firebaseapp.com',
   databaseURL: 'https://wavely-1593222928316.firebaseio.com',
   projectId: 'wavely-1593222928316',
-  storageBucket: 'wavely-1593222928316.appspot.com',
+  storageBucket: 'gs://wavely-1593222928316.appspot.com',
   messagingSenderId: '167508676948',
   appId: '1:167508676948:android:194fdb542ac40e829978c1',
 };

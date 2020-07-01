@@ -1,12 +1,30 @@
 import { StyleSheet } from 'react-native';
 
 export default StyleSheet.create({
-    container: {
+    rootContainer: {
         flex: 1,
-        alignItems: 'center'
+        justifyContent: 'center'
     },
-    title: {
-
+    button: {
+        backgroundColor: "darkorange",
+        paddingVertical: 12,
+        paddingHorizontal: 25,
+        borderRadius: 25
+    },
+    buttonText: {
+        color: 'white',
+        fontSize: 18
+    },
+    uploadContainer: {
+        flex: 1,
+        alignContent: 'center'
+    },
+    backgroundVideo: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        bottom: 0,
+        right: 0
     },
     logo: {
         flex: 1,

@@ -9,11 +9,9 @@ async function main() {
   
     // The name of the audio file to transcribe
     const fileName = './resources/audio.raw';
-  
     // Reads a local audio file and converts it to base64
     const file = fs.readFileSync(fileName);
     const audioBytes = file.toString('base64');
-  
     // The audio file's encoding, sample rate in hertz, and BCP-47 language code
     const audio = {
       content: audioBytes,
@@ -22,7 +20,7 @@ async function main() {
       encoding: 'LINEAR16',
       sampleRateHertz: 16000,
       languageCode: 'en-US',
-      model: 'phone_call', // and video
+      model: 'video',
       enableWordTimeOffsets: true
     };
     const request = {
