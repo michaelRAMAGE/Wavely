@@ -1,76 +1,17 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Dimensions } from 'react-native';
 
+const { width, height } = Dimensions.get('window');
 export default StyleSheet.create({
     rootContainer: {
+        flex: 1
+    },
+    videoContainer: {
         flex: 1,
-        justifyContent: 'center'
+        alignItems: 'center',
+        padding: 10,
     },
-    button: {
-        backgroundColor: "darkorange",
-        paddingVertical: 12,
-        paddingHorizontal: 25,
-        borderRadius: 25
-    },
-    buttonText: {
-        color: 'white',
-        fontSize: 18
-    },
-    uploadContainer: {
-        flex: 1,
-        alignContent: 'center'
-    },
-    backgroundVideo: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        bottom: 0,
-        right: 0
-    },
-    logo: {
-        flex: 1,
-        height: 120,
-        width: 90,
-        alignSelf: "center",
-        margin: 30
-    },
-    input: {
-        height: 48,
-        borderRadius: 5,
-        overflow: 'hidden',
-        backgroundColor: 'white',
-        marginTop: 10,
-        marginBottom: 10,
-        marginLeft: 30,
-        marginRight: 30,
-        paddingLeft: 16
-    },
-    button: {
-        backgroundColor: '#788eec',
-        marginLeft: 30,
-        marginRight: 30,
-        marginTop: 20,
-        height: 48,
-        borderRadius: 5,
-        alignItems: "center",
-        justifyContent: 'center'
-    },
-    buttonTitle: {
-        color: 'white',
-        fontSize: 16,
-        fontWeight: "bold"
-    },
-    footerView: {
-        flex: 1,
-        alignItems: "center",
-        marginTop: 20
-    },
-    footerText: {
-        fontSize: 16,
-        color: '#2e2e2d'
-    },
-    footerLink: {
-        color: "#788eec",
-        fontWeight: "bold",
-        fontSize: 16
+    video: { 
+        height: height/2,
+        width: width
     }
 })

@@ -1,19 +1,27 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Button, SafeAreaView, TouchableHighlight, TouchableOpacity } from 'react-native';
+import { firebase } from '../../firebase/config';
+// import speechToText from '../../scripts/gc_speechToText';
+import { AuthContext } from '../../contexts/AuthContext';
 import * as Permissions from 'expo-permissions';
 import * as ImagePicker from 'expo-image-picker';
+import React, { useState, useContext } from 'react';
+import { View, Text } from 'react-native';
+import SelectButton from '../../components/SelectButton';
+import UploadButton from '../../components/UploadButton';
 import { Video } from 'expo-av';
-import Icon from 'react-native-vector-icons/AntDesign';
 import styles from './styles';
-import PersistContext from '../../contexts/PersistContext';
+
 
 const UploadScreen = props => {
-    const setSignOut = useContext(PersistContext);
+    const setUser = useContext(AuthContext);
+
     const [uploadStatus, setUploadStatus] = useState('');
     const [video, setVideo] = useState(null); 
+    
+    // We do not need to pass user; this will grab the user
+    console.log(firebase.auth().currentUser.uid) // get current user info
 
     // load camera roll and pick video
-    pickVideo = async () => {
+    const pickVideo = async () => {
         try {
           let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -23,10 +31,9 @@ const UploadScreen = props => {
           });
           if (!result.cancelled) {
               console.log(result)
-            console.log(result.uri)
+              console.log(result.uri)
             setVideo(result.uri);
           }
-    
           console.log(result);
         } catch (E) {
           console.log(E);
@@ -45,39 +52,40 @@ const UploadScreen = props => {
     };        
 
     // upload video to server 
-    const handleUploadVideo = () => { setUploadStatus('x') }; 
-    return (
-        <View style={styles.rootContainer}>
-            <View style={styles.uploadContainer}> 
-                <TouchableHighlight  style={styles.button} onPress={handleLoadCameraRoll}>
-                    <Icon name='cloudupload' size={30}>
-                        <Text>Select a video</Text>
-                    </Icon>
-                </TouchableHighlight>
-                {
-                video && 
-                    <Video
-                        source={{ uri: video }}
-                        rate={1.0}
-                        volume={1.0}
-                        isMuted={false}
-                        resizeMode="cover"
-                        shouldPlay
-                        isLooping
-                        style={{height: 200, width: 100}}
+    const handleUploadVideo = () => { console.log('cool') }; 
 
-                    />
+    const handleTranscribe = async function() {
+        // const response = await speechToText(video);
+    }
+
+    return (
+        <View style={styles.rootContainer}> 
+            <SelectButton 
+                onTouch={handleLoadCameraRoll}
+                icon='cloudupload'
+                text='Select a video'
+            /> 
+            <View style={styles.videoContainer}>
+                { video && 
+                <Video
+                    source={{ uri: video }}
+                    rate={1.0}
+                    volume={1.0}
+                    isMuted={false}
+                    resizeMode="cover"
+                    shouldPlay={false}
+                    isLooping={false}
+                    useNativeControls
+                    style={styles.video}
+                />
                 }
             </View>
             <View>
                 { video && 
-                    <TouchableOpacity onPress={handleUploadVideo}>
-                        <View style={styles.button}> 
-                            <Text style={styles.buttonText}>
-                                Upload video
-                            </Text>
-                        </View>
-                    </TouchableOpacity>
+                <UploadButton 
+                    onTouch={handleTranscribe}
+                    text='Upload video'
+                />
                 }
             </View>
         </View>

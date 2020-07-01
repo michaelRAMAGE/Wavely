@@ -17,7 +17,7 @@ export default function App() {
     <AuthContext.Provider value={setUser}> 
       <NavigationContainer>
         { !loading ? <></> : user ? (
-          <HomeNavigator screenProps={{user}}/>
+          <HomeNavigator />
         ) : (
           <AuthNavigator /> 
         )}

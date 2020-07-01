@@ -4,7 +4,7 @@ its dependent states are updated.
 Passing down state val and state setters from our App.js
 root panel to the screens is a bit cumbersome.
 Instead, we will use Context to update parent state from 
-the children. This is subject to change in the future.  
+the children.  
 */
 
 import React from 'react';
