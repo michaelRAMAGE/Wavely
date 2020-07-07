@@ -1,4 +1,4 @@
-import { firebase } from '../../firebase/config';
+import { firebase } from '../../../server/firebase/config';
 import React, { useState, useContext } from 'react'
 import { AuthContext } from '../../contexts/AuthContext';
 import { Image, Text, TextInput, TouchableOpacity, View } from 'react-native'

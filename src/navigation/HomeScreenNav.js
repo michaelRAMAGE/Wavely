@@ -11,7 +11,7 @@ export const HomeNavigator = () => {
         <Home.Navigator style={{paddingTop:30}}> 
             <Home.Screen name="Transcripts" component={Transcripts} />
             <Home.Screen name="Upload" component={UploadScreen} />
-            {/* <Home.Screen name="Record" component={RecordScreen} /> */}
+            <Home.Screen name="Record" component={RecordScreen} />
         </Home.Navigator>
     );
 }; 

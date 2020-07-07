@@ -1,27 +1,23 @@
-import { firebase } from '../../firebase/config';
-// import speechToText from '../../scripts/gc_speechToText';
+import { firebase } from '../../../server/firebase/config';
 import { AuthContext } from '../../contexts/AuthContext';
 import * as Permissions from 'expo-permissions';
 import * as ImagePicker from 'expo-image-picker';
+import uploadFile from '../../../server/scripts/upload_file';
 import React, { useState, useContext } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, Platform } from 'react-native';
 import SelectButton from '../../components/SelectButton';
 import UploadButton from '../../components/UploadButton';
 import { Video } from 'expo-av';
 import styles from './styles';
 
-
+// We do not need to pass user; this will grab the user
+// console.log(firebase.auth().currentUser.uid) // get current user info
 const UploadScreen = props => {
     const setUser = useContext(AuthContext);
-
     const [uploadStatus, setUploadStatus] = useState('');
     const [video, setVideo] = useState(null); 
-    
-    // We do not need to pass user; this will grab the user
-    console.log(firebase.auth().currentUser.uid) // get current user info
-
-    // load camera roll and pick video
-    const pickVideo = async () => {
+    const [transcript, setTranscript] = useState(null);
+    const pickVideo = async () => { // load camera roll and pick video
         try {
           let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -30,18 +26,16 @@ const UploadScreen = props => {
             quality: 1,
           });
           if (!result.cancelled) {
-              console.log(result)
-              console.log(result.uri)
+            console.log(result)
+            console.log(result.uri)
             setVideo(result.uri);
           }
-          console.log(result);
-        } catch (E) {
-          console.log(E);
+        } 
+        catch (err) {
+          throw (err); 
         }
     };
-
-    // check perms then call pick video
-    const handleLoadCameraRoll = async function () {
+    const handleLoadCameraRoll = async function () { // check perms then call pick video
         const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
         if (status !== 'granted') { 
             throw new Error('Camera roll permission not granted ):');
@@ -50,14 +44,16 @@ const UploadScreen = props => {
             pickVideo()
         }
     };        
-
-    // upload video to server 
-    const handleUploadVideo = () => { console.log('cool') }; 
-
-    const handleTranscribe = async function() {
-        // const response = await speechToText(video);
-    }
-
+    const fetchTranscript = async () => {
+        const file_data = {
+            platform: Platform.OS,
+            kind: 'video',
+            uri: video
+        };
+        const data = await uploadFile(file_data);
+        console.log(data)
+        // setTranscript(data);
+    };
     return (
         <View style={styles.rootContainer}> 
             <SelectButton 
@@ -83,7 +79,7 @@ const UploadScreen = props => {
             <View>
                 { video && 
                 <UploadButton 
-                    onTouch={handleTranscribe}
+                    onTouch={fetchTranscript}
                     text='Upload video'
                 />
                 }
