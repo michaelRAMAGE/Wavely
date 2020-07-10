@@ -1,4 +1,5 @@
 import { firebase } from '../../../server/firebase/config';
+// import user_functions from './user_functions.js';
 import React, { useState, useContext } from 'react'
 import { AuthContext } from '../../contexts/AuthContext';
 import { Image, Text, TextInput, TouchableOpacity, View } from 'react-native'
@@ -18,8 +19,11 @@ export default function LoginScreen({navigation}) {
     }
     
     const onLoginPress = () => {
-        setUser('test')
-        // firebase
+        setUser('default') // for testing, switches away from authnav 
+        // firebase // set login persistence
+        // .auth()
+        // .setPersistence(firebase.auth.Auth.Persistence.LOCAL); // Can I set this here?
+        // firebase // login
         // .auth()
         // .signInWithEmailAndPassword(email, password)
         // .then((response) => {

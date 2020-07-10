@@ -4,19 +4,29 @@ import * as Permissions from 'expo-permissions';
 import * as ImagePicker from 'expo-image-picker';
 import uploadFile from '../../../server/scripts/upload_file';
 import React, { useState, useContext } from 'react';
-import { View, Text, Platform } from 'react-native';
-import SelectButton from '../../components/SelectButton';
-import UploadButton from '../../components/UploadButton';
+import { View, Text, Platform, ActivityIndicator, Modal, Alert } from 'react-native';
+import SelectButton from '../../components/buttons/SelectButton';
+import UploadButton from '../../components/buttons/UploadButton';
+import KeyWordInput from '../../components/misc/KeywordInput';
 import { Video } from 'expo-av';
 import styles from './styles';
 
+
 // We do not need to pass user; this will grab the user
 // console.log(firebase.auth().currentUser.uid) // get current user info
-const UploadScreen = props => {
+const UploadScreen = ({state, navigation, descriptors, progress}) => {
+    // console.log(navigation)
+    // console.log(state)
+    // console.log(descriptors)
+    // console.log(progress)
     const setUser = useContext(AuthContext);
-    const [uploadStatus, setUploadStatus] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
     const [video, setVideo] = useState(null); 
-    const [transcript, setTranscript] = useState(null);
+    const [transcript, setTranscript] = useState({
+        name: '',
+        date: '',
+        transcript: ''
+    });
     const pickVideo = async () => { // load camera roll and pick video
         try {
           let result = await ImagePicker.launchImageLibraryAsync({
@@ -26,8 +36,6 @@ const UploadScreen = props => {
             quality: 1,
           });
           if (!result.cancelled) {
-            console.log(result)
-            console.log(result.uri)
             setVideo(result.uri);
           }
         } 
@@ -41,24 +49,68 @@ const UploadScreen = props => {
             throw new Error('Camera roll permission not granted ):');
         }
         else {
-            pickVideo()
+            pickVideo();
         }
     };        
-    const fetchTranscript = async () => {
-        const file_data = {
-            platform: Platform.OS,
-            kind: 'video',
-            uri: video
-        };
-        const data = await uploadFile(file_data);
-        console.log(data)
-        // setTranscript(data);
+    const fetchTranscript = () => {
+        setIsLoading(true); 
+        setTimeout(() => { 
+            setIsLoading(false);
+            // // GET user auth id
+            // var user = firebase.auth().currentUser;
+            // if (user) {
+            //     // Transcript name
+            //     var transcript_name = `Untitled_${Date.now()}`; 
+            //     <KeywordInput 
+            //         instructionText='Name this transcript'
+            //         inputPlaceholder="Enter name"
+            //         onSubmit={setKeyQuery}
+            //     />
+            //     // Set transcript 
+            //     setTranscript({
+            //         name: transcript_name,
+            //         date: Date.now(),
+            //         transcript: 'I had fun'
+            //     })
+            //     // Save transcript to database
+            //     const uid = user.uid; 
+            //     const userRef = firebase.firestore().collection('users')
+            //     userRef.doc(uid).collection('transcripts').set(transcript); 
+            // } 
+            navigation.navigate('Transcripts'); // transfer to transcripts page
+        }, 5000);
+        // const file_data = {
+        //     platform: Platform.OS,
+        //     kind: 'video',
+        //     uri: video
+        // };
+        // uploadFile(file_data).then((data) => { // upload to server and process request 
+        //     console.log(`File uploaded, converted, and transcript retrieved: ${data}`); 
+        //     setTranscript(data); 
+        // });
     };
     return (
-        <View style={styles.rootContainer}> 
+        <>
+        <Modal 
+            animationType='slide'
+            transparent={false}
+            visible={isLoading}
+            onRequestClose={() => {
+                Alert.alert('Modal has been closed.');
+            }}
+        >
+            <View style={{flex:1, justifyContent: 'center', alignItems: 'center'}}> 
+                <Text size={30}>Processing request</Text>
+                <ActivityIndicator size={40}/>
+            </View>
+        </Modal>
+        <View style={styles.rootContainer}>
             <SelectButton 
                 onTouch={handleLoadCameraRoll}
+                buttonStyle={styles.selectButton}
                 icon='cloudupload'
+                iconSize={30}
+                textStyle={{}}
                 text='Select a video'
             /> 
             <View style={styles.videoContainer}>
@@ -76,15 +128,18 @@ const UploadScreen = props => {
                 />
                 }
             </View>
-            <View>
+            <View >
                 { video && 
                 <UploadButton 
                     onTouch={fetchTranscript}
                     text='Upload video'
+                    buttonStyle={{}}
+                    textStyle={{fontSize: 23}}
                 />
                 }
             </View>
         </View>
+        </>
     );
 };
 

@@ -6,7 +6,9 @@ files to be converted into transcripts.
 const {Storage} = require('@google-cloud/storage');
 
 const bucketName = 'gs://wavely-1593222928316.appspot.com';
-const storage = new Storage();
+const storage = new Storage({keyFilename: '/home/ramage/projects/Wavely/wavely/wavely-1593222928316-527b86c62251.json'});
+// const storage = new Storage({keyFilename: "key.json"});
+
 module.exports = (filename) => {
     console.log('In cloud-storage.js...');
     return new Promise((resolve,reject) => { 

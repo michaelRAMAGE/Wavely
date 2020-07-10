@@ -19,9 +19,10 @@ Look back to understand earlier bug.
 Replicate by moving resolve outside of command chain.
 This will result in cloud_storage.js being called before
 conversion is completed. 
+
+Error: 
+Outputting 0 second wav (audio) file
 */
-
-
 const fs = require('fs');
 const os = require('os');
 const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
@@ -35,11 +36,9 @@ module.exports = (paths) => {
         if (!fs.existsSync(paths.input)) { throw new Error('Input file does not exist')};
         try {
             var command = new FfmpegCommand();
-            console.log('before conversion')
             command
             .on('start', () => console.log('Starting conversion...'))
             .input(paths.input)
-            .noVideo()
             .outputOptions([
                 '-f s16le', // output format
                 '-acodec pcm_s16le',// set audio codec

@@ -1,5 +1,7 @@
-export { default as Transcripts } from './Transcripts/Transcripts'
 export { default as LoginScreen } from './LoginScreen/LoginScreen'
 export { default as RecordScreen } from './RecordScreen/RecordScreen'
 export { default as RegisterScreen } from './RegisterScreen/RegisterScreen'
 export { default as UploadScreen } from './UploadScreen/UploadScreen'
+export { default as SignOutScreen } from './SignOutScreen/SignOutScreen'
+export { default as TranscriptListScreen } from './TranscriptScreens/TranscriptListScreen'
+export { default as TranscriptDetailScreen } from './TranscriptScreens/TranscriptDetailScreen'

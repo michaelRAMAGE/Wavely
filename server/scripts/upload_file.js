@@ -5,8 +5,10 @@ file uploads to our server.
 const axios = require('axios'); 
 
 module.exports = async (file_data) => {
+    console.log('Uploading file to server...');
     const { platform, kind, uri } = file_data; 
-    const server = 'http://10.84.1.78:3000/' + kind.toString();
+    const server = 'http://10.84.1.78:3000/';
+    const server_tunnel = 'https://3be13458e69d.ngrok.io';
     try {
         const formData = new FormData();
         formData.append('file', { // file to upload to server
@@ -20,12 +22,12 @@ module.exports = async (file_data) => {
                 : 
                 ( kind === 'video' ? `${Date.now()}.mov` : `${Date.now()}.m4a`),
         }); 
-        const { data } = await axios.post(server, formData, {
+        const { data } = await axios.post(server_tunnel, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
         });
-        return data; 
+        return data; // response from axios post req
     }
     catch (error) { console.error('Error: ', error) }
 }

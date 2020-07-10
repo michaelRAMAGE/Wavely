@@ -18,8 +18,8 @@ module.exports = (paths) => {
     return new Promise((resolve, reject) => { 
         linear16(paths)
         .then(wav_file => { return cloud_storage(wav_file) } )
-        .then(speech_input => { return cloud_speech(speech_input) } )
-        .then(results => resolve(results))
+        .then(speech_input => { return cloud_speech(speech_input.name) } )
+        .then(results => { console.log(results); resolve(results) } )
         .catch(err => reject(err)); 
     });
 }; 

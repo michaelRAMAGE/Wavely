@@ -9,6 +9,9 @@ import { decode, encode} from 'base-64';
 if (!global.btoa) { global.btoa = encode }
 if (!global.atob) { global.atob = decode }
 
+// to do 
+  // use on auth state changed and pass setuser
+
 export default function App() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);

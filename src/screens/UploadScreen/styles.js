@@ -1,17 +1,20 @@
 import { StyleSheet, Dimensions } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
-export default StyleSheet.create({
+const styles = StyleSheet.create({
     rootContainer: {
-        flex: 1
+        flex: 1,
+        justifyContent: 'center',
+        alignContent: 'center'
     },
     videoContainer: {
         flex: 1,
         alignItems: 'center',
-        padding: 10,
     },
     video: { 
+        flex: 1,
         height: height/2,
         width: width
-    }
+    },
 })
+export default styles; 

@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, Platform,
 import { Audio } from 'expo-av';
 import * as FileSystem from 'expo-file-system'; 
 import * as Permissions from 'expo-permissions';
-import KeywordInput from '../../components/KeywordInput';
+import KeywordInput from '../../components/misc/KeywordInput';
 import Icon from 'react-native-vector-icons/Entypo';
 import uploadFile from '../../../server/scripts/upload_file'
 
@@ -97,7 +97,7 @@ const RecordScreen = props => {
     }
     return ( 
         <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-            {isRecording? 
+            {isRecording ? 
             <TouchableHighlight onPress={()=> { stopRecording(); fetchTranscripts(); }}> 
                 <Icon name='controller-stop' size={40} color='red'>
                     Stop
@@ -112,11 +112,7 @@ const RecordScreen = props => {
             }   
         </View>
 
-        // <KeywordInput 
-        //     instructionText='Search your audio for these keywords'
-        //     inputPlaceholder="Enter keywords each separated by ','"
-        //     onSubmit={setKeyQuery}
-        // />
+
     );
 };
 

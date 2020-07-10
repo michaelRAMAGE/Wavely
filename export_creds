@@ -1,0 +1,3 @@
+#!/usr/bin/bash
+echo 'Exporting google service account credentials for wavely development..."
+export GOOGLE_APPLICATION_CREDENTIALS="/home/ramage/projects/Wavely/wavely/wavely-1593222928316-d08c7495a041.json"

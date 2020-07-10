@@ -21,6 +21,9 @@ export default function RegisterScreen({navigation}) {
     }
     
     const onRegisterPress = () => {
+        firebase // set login persistence
+        .auth()
+        .setPersistence(firebase.auth.Auth.Persistence.LOCAL); // Can I set this here?
         if (password != confirmPassword) { alert('Passwords do not match.'); return; };
         firebase
             .auth()

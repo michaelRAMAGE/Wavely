@@ -7,6 +7,12 @@ a script that handles the form data's file.
 This file is then fed into get_transcript(),
 an export from get_transcript.js. If no error,
 we obtain a transcript to send back to client. 
+
+Error: 
+When using nodemon for nodejs server, cannot send post
+to ngrok tunnel for localhost. In other words, this api
+endpoints are not reached. When using node to run server,
+endpoints are reached. 
 */
 const express = require('express');
 const formidable = require('formidable');
@@ -17,7 +23,8 @@ app.get('/', (req, res) => {
     res.json({message: 'Welcome to Wavely!'});
 });
 
-app.post('/video', (req, res, next) => {
+app.post('/', (req, res, next) => {
+    console.log('Handling uploaded file on server...');
     const options = {
         keepExtensions: true,
         multiples: true,
@@ -35,14 +42,10 @@ app.post('/video', (req, res, next) => {
             output: path.split('.')[0].toString() + '.wav'
         };
         get_transcript(paths)
-        .then(transcript => console.log(transcript))
+        .then(transcript => { console.log(transcript); res.send(transcript) } )
         .catch(err => { throw(err) } ); 
     });
 }); 
-
-app.post('/audio', (req, res) => {
-    console.log('Received audio file');
-});
 
 app.listen(3000, () => {
     console.log('Server is running on port 3000');
