@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dimensions, View, SafeAreaView } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
 import { 
@@ -15,11 +15,59 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { useNavigation, DrawerActions, useRoute } from '@react-navigation/native';
 import TranscriptPageHeader from '../components/headers/TranscriptDetailHeader';
 
-// Things to do :
-// Title on top
-// Fix up drawer button
-// Add modal for signout 
-//  Custom drawer for signout
+    // Structure
+        // top navigator (STACK) - HomeNav
+        // middle navigator (DRAWER) - DrawerNav
+        // final navigator (STACK) - TranscriptNav
+
+        // HomeNav has 1 screen component
+            // DrawerNav
+        // DrawerNav has 4 screen components
+            // Record
+            // Upload 
+            // Transcripts
+            // SignOut
+        // TranscriptNav has 2 components
+            // TranscriptList
+            // TranscriptDetails
+    // Goal
+        // The goal is to conditionally set
+        // header for all screens under HomeNav.
+        // In my case, I want to set TranscriptDetails
+        // to a different header and the rest of the 
+        // screens can use the same header. This is subject
+        // change though, so I want to maintain good practice and
+        // have flexibility (do not want a hardcoded solution
+        // that is hard to maintain). I am not sure of the best way
+        // to approach this. 
+        // I know some ways to solve what I am doing.
+            // 1. I can just embed the header components
+            // in their correct screens and style each
+            // respectively. This is not really a bad
+            // solution (I do not think), but I would need
+            // to update each page's style. I would need
+            // a common page template for each page so that
+            // the header height and such remains consistent
+            // across screens. After this, I could just drop
+            // headers into whatever screens I want and their
+            // would already be styling setup to control the 
+            // presentation. This solution would be robust insofar
+            // that an update in hooks by react native would not
+            // affect my solution. I am not depending on hook properties.
+            // I am not sure this is a big issue, but I read on useNavigationState,
+            // and they mention properties to be deprecated. 
+            // 2. I can use an existing hook and create some hook,
+            // where I return a header based on page state. This is
+            // kind of what I am doing now. I WANT to use HomeNav stack
+            // to render headers for current screen. This way I do not 
+            // need to style each page. Because HomeNav is stack, it has
+            // options property which in turn has a property header, where
+            // a custom header can be rendered. I want to conditionally 
+            // render headers here. When I say existing hook, there may
+            // also be a way to do it with just navigation and route
+            // properties of root screen component; I have not looked into 
+            // that yet. I personally feel like I would learn more about 
+            // from using an approach like this
 
 const HomeDrawer = createDrawerNavigator();
 const HomeStack = new createStackNavigator();
@@ -33,7 +81,9 @@ based on current page.
 */
 const useHeader = sets => { // header set, page set
     const [isSet, setSet] = useState(null);
-    
+    const route = useRoute();
+
+    const current_screen = null;
 
     return isSet;
 }
@@ -43,10 +93,18 @@ const useHeader = sets => { // header set, page set
 This button is used in HomeNavigator's Stack Navigation header.
 It opens and closes the drawer navigator (using the drawer's state). 
 */
-const DrawerButton = () => { // open drawer navigation
+const DrawerButton = (navigation) => { // open drawer navigation
     const [isOpen, setIsOpen] = useState(false)
     const route = useRoute(); 
-    console.log(route)
+    // console.log('STATE: ', route.state, ':END')
+    if (route.state) {
+        // console.log('HISTORY: ', route.state.history, ':END')
+        console.log('ROUTES: ', route.state.routes, ':END') 
+        // route.state.routes[1].state.routes.length === 2 ?
+    }
+
+    // where the value is updated for visit screen
+    // it gets its own route object --> the deep stack is now in sight
     const navigation = useNavigation(); // how does this work under the hood?
     // console.log(navigation)
     return (
@@ -157,7 +215,7 @@ export const HomeNavigator = () => {
             <HomeStack.Screen 
                 name='Wavely' 
                 options={{ 
-                    header: () => {
+                    header: ({navigation, route}) => {
                         const sets = { // each key is a page set for a given header
                             set1: {
                                 pages: ['Upload', 'Record', 'SignOut', 'TranscriptList'],
@@ -170,7 +228,7 @@ export const HomeNavigator = () => {
                                 props: {}
                             }
                         }
-                        var headerState = useHeader(sets); 
+                        // var headerState = useHeader(sets); 
                         return <DrawerButton />;
 
                     },

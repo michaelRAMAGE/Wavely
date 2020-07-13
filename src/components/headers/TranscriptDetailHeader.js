@@ -11,7 +11,7 @@ const TranscriptPageHeader = (props) => {
         // email
         // google docs
         // ...more
-        console.log('name: ', props)
+
     return (
         <View style={styles.headerContainer}>
             <View style={styles.leftSide}>

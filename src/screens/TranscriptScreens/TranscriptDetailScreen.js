@@ -1,14 +1,14 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet,Button } from 'react-native';
 
-const TranscriptDetailsScreen = ({ route }) => {
+const TranscriptDetailsScreen = ({ navigation, route }) => {
     const { transcriptData } = route.params.data; 
-    console.log(route)
     return (
         <View style={styles.rootContainer}>
             <View style={styles.content}>
                 <Text>Transcript Content Page</Text>
             </View>
+            <View><Button title='go back' onPress={() => navigation.navigate('TranscriptList')} /></View>
         </View>
     );
 };
