@@ -4,30 +4,40 @@ import {
     View, 
     StyleSheet,
     FlatList, 
-    SafeAreaView } 
+    SafeAreaView,
+    ActivityIndicator 
+} 
 from 'react-native';
 // import styles from './styles';
 import { AuthContext } from '../../contexts/AuthContext';
 import Item from '../../components/misc/Item';
-
 
 export default function TranscriptsListScreen ({navigation}) {
     const setUser = useContext(AuthContext);  
     const [isLoading, setLoading] = useState(false);
     const [transcripts, setTranscripts] = useState([]);
     const [selectId, setSelectId] = useState(null);
-    // useEffect(() => {    
-    //     firebase.firestore()
-    //             .collection('Users')
-    //             .doc(uid)
-    //             .collection('transcripts')
-    //             .onSnapshot(snapshot => {
-    //                 const transcripts = [];
-    //                 snapshot.forEach(transcript => {
-    //                     tramscripts.push({})
-    //                 })
-    //             })
-    // },[])
+    useEffect(() => {    
+        firebase.firestore()
+                .collection('Users')
+                .doc(uid)
+                .collection('transcripts')
+                .onSnapshot(snapshot => {
+                    const transcripts = [];
+                    snapshot.forEach(transcript => {
+                        transcripts.push({
+                            ...transcript.data(),
+                            key: transcript.id,
+                        });
+                    });
+                    setTranscripts(transcripts);
+                    setLoading(false); 
+                });
+
+    },[]);
+    
+    if (loading) { return <ActivityIndicator />}
+
     const TEST_DATA = [
         {
             id: Math.random().toString(),
@@ -74,12 +84,10 @@ export default function TranscriptsListScreen ({navigation}) {
             transcript: 'today we will learn about cut vertices'
         },
     ];
-
-    const handleLoadPage = (item) => { // go to its details page 
+    const handleLoadPage = (item) => { // list item buttons
         navigation.navigate('TranscriptDetail', 
-        { data: item });
+        { name: 'TranscriptDetail',  data: item }); // pass data on click
     };
-
     const renderItem = ({ item }) => {
         return (
             <Item 
@@ -92,11 +100,6 @@ export default function TranscriptsListScreen ({navigation}) {
             />
         );
     };
-    // Fetch transcripts
-        // Only load when a NEW transcript has been reproduced
-        // We navigate to this page with data
-
-    // List transcripts
     return ( 
         <View style={styles.rootContainer}>
             <SafeAreaView>
