@@ -77,7 +77,7 @@ export default function TranscriptsListScreen ({navigation}) {
 
     const handleLoadPage = (item) => { // go to its details page 
         navigation.navigate('TranscriptDetail', 
-        { data: item });
+        { name: 'TranscriptDetail',  data: item });
     };
 
     const renderItem = ({ item }) => {

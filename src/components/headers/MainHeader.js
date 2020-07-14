@@ -1,21 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import BackIcon from 'react-native-vector-icons/AntDesign' // arrow-back-circle
 import OptionIcon from 'react-native-vector-icons/SimpleLineIcons' // options
-import { useNavigation } from '@react-navigation/native';
+import DrawerButton from '../buttons/DrawerButton';
 
-const TranscriptPageHeader = (props) => {
-    const navigation = useNavigation(); // use TranscriptStackNav navigation prop
+const MainHeader = (props) => {
     return (
         <View style={styles.headerContainer}>
             <View style={styles.leftSide}>
-                <BackIcon.Button 
-                    size={20}
-                    backgroundColor='black'
-                    name='fastbackward' 
-                    backgroundColor="#3b5998"
-                    onPress={() => navigation.navigate('TranscriptList')}
-                />
+                <DrawerButton />
             </View>
             <View style={styles.middleSide}>
                 <Text>{props.name}</Text>
@@ -26,12 +18,13 @@ const TranscriptPageHeader = (props) => {
                         backgroundColor='black'
                         name='options'
                         backgroundColor="#3b5998"
-                        onPress={() => {alert('Open up options modal')}}
+                        onPress={props.optionPress}
                 />
             </View>
         </View>
     );
 }
+
 const styles = StyleSheet.create({
     rootContainer: {
         flex: 1,
@@ -59,4 +52,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default TranscriptPageHeader; 
+export default MainHeader; 
