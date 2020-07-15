@@ -52,42 +52,55 @@ const UploadScreen = ({state, navigation, descriptors, progress}) => {
             pickVideo();
         }
     };        
-    const fetchTranscript = () => {
+    const fetchTranscript = () => { // upload file; get and save trancript
         setIsLoading(true); 
-        setTimeout(() => { 
-            setIsLoading(false);
-            // // GET user auth id
-            // var user = firebase.auth().currentUser;
-            // if (user) {
-            //     // Transcript name
-            //     var transcript_name = `Untitled_${Date.now()}`; 
-            //     <KeywordInput 
-            //         instructionText='Name this transcript'
-            //         inputPlaceholder="Enter name"
-            //         onSubmit={setKeyQuery}
-            //     />
-            //     // Set transcript 
-            //     setTranscript({
-            //         name: transcript_name,
-            //         date: Date.now(),
-            //         transcript: 'I had fun'
-            //     })
-            //     // Save transcript to database
-            //     const uid = user.uid; 
-            //     const userRef = firebase.firestore().collection('users')
-            //     userRef.doc(uid).collection('transcripts').set(transcript); 
-            // } 
-            navigation.navigate('Transcripts'); // transfer to transcripts page
-        }, 5000);
-        // const file_data = {
-        //     platform: Platform.OS,
-        //     kind: 'video',
-        //     uri: video
-        // };
-        // uploadFile(file_data).then((data) => { // upload to server and process request 
-        //     console.log(`File uploaded, converted, and transcript retrieved: ${data}`); 
-        //     setTranscript(data); 
-        // });
+        // setTimeout(() => { 
+        //     setIsLoading(false);
+        //     var user = firebase.auth().currentUser;
+        //     if (user) {
+        //         var transcript_name = `Untitled_${Date.now()}`; 
+        //         <KeywordInput 
+        //             instructionText='Name this transcript'
+        //             inputPlaceholder="Enter name"
+        //             onSubmit={setKeyQuery}
+        //         />
+        //         setTranscript({
+        //             name: transcript_name,
+        //             date: Date.now(),
+        //             transcript: 'I had fun'
+        //         })
+        //         const userRef = firebase.firestore().collection('users')
+        //         userRef.doc(user.uid).collection('transcripts').set(transcript); 
+        //     } 
+        //     navigation.navigate('Transcripts'); // transfer to transcripts page
+        // }, 5000);
+        const file_data = {
+            platform: Platform.OS,
+            kind: 'video',
+            uri: video
+        };
+        uploadFile(file_data).then((data) => { // upload to server and process request 
+            console.log(`File uploaded, converted, and transcript retrieved: ${data}`); 
+            var user = firebase.auth().currentUser;
+            if (user) {
+                var transcript_name = `Untitled_${Date.now()}`; 
+                <KeywordInput 
+                    instructionText='Name this transcript'
+                    inputPlaceholder="Enter name"
+                    onSubmit={setKeyQuery}
+                />
+                setTranscript({
+                    name: transcript_name,
+                    date: Date.now(),
+                    transcript: data
+                })
+                const userRef = firebase.firestore().collection('users')
+                userRef.doc(user.uid).collection('transcripts').set(transcript); 
+            }
+            else {
+                throw new Error('Error: user is not recognized')
+            }
+        });
     };
     return (
         <>
@@ -142,6 +155,4 @@ const UploadScreen = ({state, navigation, descriptors, progress}) => {
         </>
     );
 };
-
-
 export default UploadScreen;

@@ -1,3 +1,11 @@
+/*
+TranscriptDetailScreen hosts
+specific data about a specific
+transcript. TranscriptListScreen 
+has a FlatList with items. When 
+an item is clicked, this page will
+be generated provided navigation data. 
+*/
 import React, { useContext, useEffect } from 'react';
 import { View, Text, StyleSheet, Button } from 'react-native';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';

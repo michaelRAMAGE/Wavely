@@ -1,3 +1,10 @@
+/*
+This screen hosts a user's transcripts.
+The transcripts are rendered in a FlatList.
+If a user clicks on an item in the FlatList
+(a transcript), they will be directed to 
+that transcript's TranscriptDetailScreen. 
+*/
 import { firebase } from '../../../server/firebase/config';
 import React, { useState, useContext, useEffect } from 'react';
 import { 
@@ -10,24 +17,36 @@ from 'react-native';
 import { AuthContext } from '../../contexts/AuthContext';
 import Item from '../../components/misc/Item';
 
-
-export default function TranscriptsListScreen ({navigation}) {
+export default function TranscriptsListScreen ({ navigation }) {
     const setUser = useContext(AuthContext);  
-    const [isLoading, setLoading] = useState(false);
+    const [isLoading, setLoading] = useState(true);
     const [transcripts, setTranscripts] = useState([]);
     const [selectId, setSelectId] = useState(null);
-    // useEffect(() => {    
-    //     firebase.firestore()
-    //             .collection('Users')
-    //             .doc(uid)
-    //             .collection('transcripts')
-    //             .onSnapshot(snapshot => {
-    //                 const transcripts = [];
-    //                 snapshot.forEach(transcript => {
-    //                     tramscripts.push({})
-    //                 })
-    //             })
-    // },[])
+    useEffect(() => { // get transcripts
+        var user = firebase.auth().currentUser;
+        if (user) {
+            // Get transcripts from database
+            const subscribe = firebase.firestore()
+                    .collection('Users')
+                    .doc(user.uid)
+                    .collection('transcripts')
+                    .onSnapshot(snapshot => {
+                        const transcripts = [];
+                        snapshot.forEach(transcript => {
+                            console.log('transcript: ', transcript)
+                            transcripts.push({
+                                ...transcript.data(),
+                                key: transcript.id,
+                            });
+                        });
+                        setTranscripts(transcripts);
+                        setLoading(false);
+                    });
+
+            return () => subscribe();
+        }
+        else { throw new Error('Error: user not recognized') }
+    },[])
     const TEST_DATA = [
         {
             id: Math.random().toString(),
@@ -74,12 +93,10 @@ export default function TranscriptsListScreen ({navigation}) {
             transcript: 'today we will learn about cut vertices'
         },
     ];
-
     const handleLoadPage = (item) => { // go to its details page 
         navigation.navigate('TranscriptDetail', 
         { name: 'TranscriptDetail',  data: item });
     };
-
     const renderItem = ({ item }) => {
         return (
             <Item 
@@ -92,11 +109,6 @@ export default function TranscriptsListScreen ({navigation}) {
             />
         );
     };
-    // Fetch transcripts
-        // Only load when a NEW transcript has been reproduced
-        // We navigate to this page with data
-
-    // List transcripts
     return ( 
         <View style={styles.rootContainer}>
             <SafeAreaView>
