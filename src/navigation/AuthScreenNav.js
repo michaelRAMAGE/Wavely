@@ -6,9 +6,7 @@ import { LoginScreen, RegisterScreen } from '../screens/index';
 export const AuthNavigator = () => {
     const AuthStack = new createStackNavigator();
 
-    // firebase // set login persistence
-    // .auth()
-    // .setPersistence(firebase.auth.Auth.Persistence.LOCAL); // Can I set this here?
+    
     return (
         <AuthStack.Navigator> 
             <>

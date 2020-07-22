@@ -26,15 +26,10 @@ const MainHeader = (props) => {
 }
 
 const styles = StyleSheet.create({
-    rootContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignContent: 'center'
-    },
     headerContainer: {
         // backgroundColor: 'blue',
         flexDirection: 'row',
-        marginTop: 25
+        backgroundColor: 'white'
     },
     leftSide: {
         flex: .2,

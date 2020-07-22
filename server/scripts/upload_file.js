@@ -5,10 +5,10 @@ file uploads to our server.
 const axios = require('axios'); 
 
 module.exports = async (file_data) => {
-    console.log('Uploading file to server...');
+    console.log(`Uploading file to server...${file_data}`);
     const { platform, kind, uri } = file_data; 
     const server = 'http://10.84.1.78:3000/';
-    const server_tunnel = 'https://3be13458e69d.ngrok.io';
+    const server_tunnel = 'http://f7ed1d754721.ngrok.io';
     try {
         const formData = new FormData();
         formData.append('file', { // file to upload to server

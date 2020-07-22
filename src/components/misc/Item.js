@@ -13,7 +13,9 @@ const Item = ({item, onPress, style}) => {
         <TouchableOpacity onPress={onPress} style={style}>
             <View style={styles.leftItem}>
                 <Text style={{color: 'black'}}> Date: {item.date} </Text>
-                <Text style={{color: 'black'}}> Length: {item.time} </Text>
+                { item.file_info.duration &&
+                    <Text style={{color: 'black'}}> Duration: {item.file_info.duration} </Text>
+                }
             </View>
             <View style={styles.middleItem}>
                 <Text style={{fontSize: 20, fontWeight: 'bold', color: 'black'}}> 

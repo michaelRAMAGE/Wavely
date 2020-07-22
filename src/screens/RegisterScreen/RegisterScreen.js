@@ -7,8 +7,6 @@ import styles from './styles';
 
 
 export default function RegisterScreen({navigation}) {
-    console.log('register')
-
     const setUser = useContext(AuthContext);
 
     const [fullName, setFullName] = useState('')

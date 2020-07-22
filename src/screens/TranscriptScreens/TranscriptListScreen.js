@@ -6,7 +6,7 @@ If a user clicks on an item in the FlatList
 that transcript's TranscriptDetailScreen. 
 */
 import { firebase } from '../../../server/firebase/config';
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
     View, 
     StyleSheet,
@@ -14,92 +14,101 @@ import {
     SafeAreaView } 
 from 'react-native';
 // import styles from './styles';
-import { AuthContext } from '../../contexts/AuthContext';
 import Item from '../../components/misc/Item';
+import { Loading } from '../../components';
+import { SearchBar, useTitle } from '../../components/index';
 
 export default function TranscriptsListScreen ({ navigation }) {
-    const setUser = useContext(AuthContext);  
-    const [isLoading, setLoading] = useState(true);
+    const [isLoading, setLoading] = useState(false);
     const [transcripts, setTranscripts] = useState([]);
     const [selectId, setSelectId] = useState(null);
-    useEffect(() => { // get transcripts
-        var user = firebase.auth().currentUser;
-        if (user) {
-            // Get transcripts from database
-            const subscribe = firebase.firestore()
-                    .collection('Users')
-                    .doc(user.uid)
-                    .collection('transcripts')
-                    .onSnapshot(snapshot => {
-                        const transcripts = [];
-                        snapshot.forEach(transcript => {
-                            console.log('transcript: ', transcript)
-                            transcripts.push({
-                                ...transcript.data(),
-                                key: transcript.id,
-                            });
-                        });
-                        setTranscripts(transcripts);
-                        setLoading(false);
-                    });
+    
+    // useEffect(() => { // get transcripts
+    //     console.log('Render action (TranscripListScreen)')
+    //     var user = firebase.auth().currentUser;
+    //     if (user) {
+    //         // Get transcripts from database
+    //         const subscribe = firebase.firestore()
+    //                 .collection('Users')
+    //                 .doc(user.uid)
+    //                 .collection('transcripts')
+    //                 .onSnapshot(snapshot => {
+    //                     const transcripts = [];
+    //                     snapshot.forEach(transcript => {
+    //                         console.log('transcript: ', transcript)
+    //                         transcripts.push({
+    //                             ...transcript.data(),
+    //                             key: transcript.id,
+    //                         });
+    //                     });
+    //                     setTranscripts(transcripts);
+    //                     setLoading(false);
+    //                 });
 
-            return () => subscribe();
-        }
-        else { throw new Error('Error: user not recognized') }
-    },[])
-    const TEST_DATA = [
-        {
+    //         return () => subscribe();
+    //     }
+    //     else { throw new Error('Error: user not recognized') }
+    // },[]);
+
+    const TEST_DATA = [ 
+        { // do not rerender on transcript set
             id: Math.random().toString(),
-            name: 'Title1',
+            file_info: {
+                duration: '0.5'
+            }, // should one state reference another?
+            name: 'test1',
             date: 'monday',
-            time: '0:53',
-            transcript: 'hello my friend'
-
+            data:  {
+                audio_name: 'test', 
+                speech_data: []
+            }   
         },
-        {
+        { // do not rerender on transcript set
             id: Math.random().toString(),
-            name: 'Title2',
-            date: 'tuesday',
-            time: '0:28',
-            transcript: 'welcome to my channel'
-        },
-        {
-            id: Math.random().toString(),
-            name: 'Title3',
-            date: 'wednesday',
-            time: '0:55',
-            transcript: 'today we will learn about cut vertices'
-        },
-        {
-            id: Math.random().toString(),
-            name: 'Title4',
+            file_info: {
+                duration: '0.5'
+            }, // should one state reference another?
+            name: 'test2',
             date: 'monday',
-            time: '0:53',
-            transcript: 'hello my friend'
-
+            data:  {
+                audio_name: 'test', 
+                speech_data: []
+            }   
         },
-        {
+        { // do not rerender on transcript set
             id: Math.random().toString(),
-            name: 'Title5',
-            date: 'tuesday',
-            time: '0:28',
-            transcript: 'welcome to my channel'
+            file_info: {
+                duration: '0.5'
+            }, // should one state reference another?
+            name: 'test3',
+            date: 'monday',
+            data:  {
+                audio_name: 'test', 
+                speech_data: []
+            }   
         },
-        {
+        { // do not rerender on transcript set
             id: Math.random().toString(),
-            name: 'Title6',
-            date: 'wednesday',
-            time: '0:55',
-            transcript: 'today we will learn about cut vertices'
+            file_info: {
+                duration: '0.5'
+            }, // should one state reference another?
+            name: 'test4',
+            date: 'monday',
+            data:  {
+                audio_name: 'test', 
+                speech_data: []
+            }   
         },
     ];
+
     const handleLoadPage = (item) => { // go to its details page 
         navigation.navigate('TranscriptDetail', 
         { name: 'TranscriptDetail',  data: item });
     };
+
     const renderItem = ({ item }) => {
         return (
-            <Item 
+            <Item // manage presentation in Item.js
                 item={item}
                 onPress={() => { 
                     setSelectId(item.id); 
@@ -110,6 +119,8 @@ export default function TranscriptsListScreen ({ navigation }) {
         );
     };
     return ( 
+        <>
+        <Loading visible={isLoading} />
         <View style={styles.rootContainer}>
             <SafeAreaView>
                 <FlatList
@@ -120,8 +131,10 @@ export default function TranscriptsListScreen ({ navigation }) {
                 />
             </SafeAreaView>
         </View>
+        </>
     );
 };
+
 const styles = StyleSheet.create({
     rootContainer: {
         flex: 1,

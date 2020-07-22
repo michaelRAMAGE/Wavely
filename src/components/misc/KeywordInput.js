@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, TextInput, Button } from 'react-native';
 
 const KeywordInput = props => {
     const [keywords, setKeywords] = useState('');
-
     return ( 
         <View style={styles.keywordInputContainer}>
             <Text style={styles.textInput}> {props.instructionText} </Text>
@@ -15,8 +14,18 @@ const KeywordInput = props => {
                 />
             </View>
             <View style={styles.buttonInputContainer}>
-                <Button title='Clear' onPress={() => setKeywords('') } /> 
-                <Button title='Submit'onPress={() => { props.onSubmit(keywords); setKeywords('') }} />
+                <Button color='black' title='Clear' onPress={() => setKeywords('') } /> 
+                <Button color='black' title='Submit' 
+                    onPress={() => { 
+                        if (keywords) { 
+                            props.onSubmit(keywords); 
+                            setKeywords('');
+                        }
+                        else { 
+                            props.onSubmit(`Untitled_${Date.now()}`);
+                        }
+                    }}
+                />
             </View>
         </View>
     );
@@ -29,18 +38,20 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     },
     textInput: {
-        fontSize: 17,
-        textAlign: 'center'
+        fontSize: 20,
+        textAlign: 'center',
+        marginBottom: 20,
     },
-    keywordInput: {
-        borderTopWidth: 1,
-        borderBottomWidth: 1,
-        maxWidth: '80%'
+    keywordInputContainer: {
+
     },
     buttonInputContainer: {
         flexDirection: 'row',
         justifyContent: 'space-evenly',
-        padding: 10
+        marginTop: 20
+    },
+    keywordInput: {
+        borderWidth: 1
     }
 });
 
