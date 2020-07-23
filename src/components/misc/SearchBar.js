@@ -11,7 +11,7 @@ const SearchBar = (props) => {
             <TouchableHighlight 
                 style={styles.submitSpace} 
                 underlayColor='transparent'
-                onPress={() => { props.onSubmit(null); onChangeText(''); }}
+                onPress={() => { props.onSubmit([]); onChangeText(''); }}
             >
                 <View>
                     <ResetIcon name='restore' size={30} />

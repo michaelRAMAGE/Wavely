@@ -49,45 +49,6 @@ const TranscriptNav = ({navigation}) => { // dynamic page loads
     );
 }
 
-
-const UploadNav = ({navigation}) => { // dynamic page loads
-    return (
-        <TranscriptStack.Navigator
-            initialRoutName='TranscriptList'
-            headerMode='screen'
-        >
-            <TranscriptStack.Screen
-                name='TranscriptDetail'
-                component={TranscriptDetailScreen}
-                options={{
-                    header: () => {
-                        return (<TranscriptDetailHeader /> );
-                    },
-                }}
-            /> 
-        </TranscriptStack.Navigator>
-    );
-}
-
-const RecordNav = ({navigation}) => { // dynamic page loads
-    return (
-        <TranscriptStack.Navigator
-            initialRoutName='Record'
-            headerMode='screen'
-        >
-            <TranscriptStack.Screen
-                name='Record'
-                component={TranscriptDetailScreen}
-                options={{
-                    header: () => {
-                        return (<TranscriptDetailHeader /> );
-                    },
-                }}
-            /> 
-        </TranscriptStack.Navigator>
-    );
-}
-
 /* 
 Note: HomeDrawerNav is now HomeNavigator.
 HomeDrawerNav is a component in HomeNavigator; it controls
@@ -159,11 +120,11 @@ const HomeNavigator = () => {
                 }}
             >
                 <HomeStack.Screen 
-                    name='Wavely' 
-                    // options={{ 
-                    //     header: () => { console.log(head); return head },
-                    //     title: 'Wavely',
-                    // }}
+                    // name='Wavely' 
+                    // // options={{ 
+                    // //     header: () => { console.log(head); return head },
+                    // //     title: 'Wavely',
+                    // // }}
                     component={HomeDrawerNav}
                     
                 />

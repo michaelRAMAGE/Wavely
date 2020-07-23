@@ -8,4 +8,4 @@ export { default as useTitle } from './misc/useTitle';
 export { default as SearchBar } from './misc/SearchBar';
 export { default as TranscriptDetailHeader } from './headers/TranscriptDetailHeader';
 export { default as MainHeader } from './headers/MainHeader';
-export { default as TranscriptCaptionItem } from './TranscriptCaptionItem';
+export { default as TranscriptCaptionItem } from './misc/TranscriptCaptionItem';
