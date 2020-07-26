@@ -9,30 +9,56 @@ import {
 // why did hasbeenaltered give trouble inside textinput onchangetext ?
 
 const TrancriptCaptionItem = (props) => {
-    const [displayConfidence, setDisplayConfidence] = useState(true);
-    const [isEditable, setIsEditable] = useState(false); 
+    const { 
+        view_key: key, 
+        captionObject: {
+            text: text,
+            time_span: { 
+                startSecs,
+                endSecs
+            },
+            confidence
+        },
+        show,
+        onSave,
+        setPlayBackTime
+    } = props;  
+    const [captionHistory, updateCaptionHistory] = useState([text]); 
+    const [captionIdx, setCaptionIdx] = useState(0); 
+    const [currentCaption, setCurrentCaption] = useState(captionHistory[captionIdx]); 
     const [hasBeenAltered, setHasBeenAltered] = useState(false); 
-    const [caption, setCaption] = useState(props.captionObject.text);
-    const confidence = props.captionObject.confidence; 
-    const { startSecs, endSecs } = props.captionObject.time_span;
-    const key = props.view_key; 
-    const static_caption = props.captionObject.text;
-    
+    const [displayConfidence, setDisplayConfidence] = useState(true);
+
     const handleCaptionModification = () => { 
         console.log('Altered...')
-        setHasBeenAltered(false); 
-        props.onAltered(key, caption); // onAltered sets trancriptCaptions in details screen
+        setHasBeenAltered(false); // remove changes alert
+        updateCaptionHistory([...captionHistory, currentCaption]); // add new item
+        setCaptionIdx(captionIdx++); // update idx for new item
+        onSave(key, currentCaption); // communicate change to details screen
     }
 
-    const getColor = (confidence) => { // get caption color based on confidence
-        confidence = confidence * 10 * 15
-        var hsl = `hsl(${confidence}, 100%, 50%)`;
-        return hsl; 
+    const getColor = (confidence) => { 
+        if (captionIdx === 0) { 
+            confidence = confidence * 10 * 15
+            var hsl = `hsl(${confidence}, 100%, 50%)`;
+            return hsl; 
+        }
+        else { return 1; } // user changed caption; assume improved over raw data
+    }
+
+    const handleUndo = () => { 
+        captionIdx>0 ? 
+            setCaptionIdx(captionIdx-1) : setCaptionIdx(0);  
+    }
+
+    const handleRedo = () => {
+        captionIdx<captionHistory.length ? 
+            setCaptionIdx(captionIdx+1) : setCaptionIdx(captionIdx);
     }
 
     return (
         <View> 
-        { props.show ?
+        { show ?
             <View 
                 style={{
                     flex: 1,
@@ -52,22 +78,16 @@ const TrancriptCaptionItem = (props) => {
                             textAlignVertical: 'top',
                         }}
                         multiline={true}
-                        value={caption}
+                        value={currentCaption}
                         onChangeText={(value) => { 
-                                if (caption !== value) { 
-                                    console.log('caption: ', caption)
-                                    setCaption(value); 
-                                }
-                                if (static_caption !== value) {
-                                    setHasBeenAltered(true);
+                                if (captionHistory[captionIdx] !== value) { 
+                                    console.log('caption: ', currentCaption)
+                                    setCurrentCaption(value);
+                                    setHasBeenAltered(true); 
                                 }
                                 else { setHasBeenAltered(false); }
                             }
                         }
-                        // onTextInput={(value) => setCaption(value) }
-                        // onFocus={() => { setIsEditable(true); }}
-                        // onBlur={() => {  setIsEditable(false); }}
-                        // onEndEditing={() => {  setIsEditable(false); }}
                     />
                 </View>
 
@@ -101,7 +121,7 @@ const TrancriptCaptionItem = (props) => {
                         maxHeight: 30
                     }} 
                     onPress={() => {
-                        props.setPlayBackTime(parseFloat(startSecs)*1000); 
+                        setPlayBackTime(parseFloat(startSecs)*1000); 
                     }}
                 >
                     <Text style={{ color: 'black', fontWeight: 'bold' }} > 

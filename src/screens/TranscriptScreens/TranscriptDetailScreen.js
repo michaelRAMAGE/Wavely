@@ -27,18 +27,18 @@ e accounted for with show prop on TranscriptCaptionItem.
 - Send the document to email (basically the same as in TranscriptListScreen)
 - Throw error when video uri cannot be found
 -- Should we also save videos to our database or ...?
-- why can i not use dot notation is spread?
 - set listener for updates 
+- base display on number of transcript chunks and words within each chunk.
+- add trackable state for each chunk, revert to previous, or original
+- reduce code by not managing updates. deal with these in transcriptcaptionitem
 */
 
 import React, { useState, useEffect } from 'react';
 import { 
     View, 
-    Text, 
     StyleSheet,  
     Dimensions, 
     ScrollView,
-    Platform, 
 } from 'react-native';
 import { 
     SearchBar, 
@@ -46,45 +46,29 @@ import {
     useConstructor
 } from '../../components/index';
 import { Video } from 'expo-av';
-import EditIcon from 'react-native-vector-icons/AntDesign';
 
 const TranscriptDetailsScreen = ({ route }) => {
     const { width, height } = Dimensions.get('window');
-    const data = {
-        audio_name: 'testing_ui',
-        speech_data: [
-            {
-                text: 'Hello to you all!',
-                time_span: { startSecs: '17', endSecs: '1.5' },
-                confidence: .68
-            },
-            {
-                text: 'We will learn to code.',
-                time_span: { startSecs: '1.5', endSecs: '3.2' },
-                confidence: .9
-            },
-            {
-                text: 'Lets begin now',
-                time_span: { startSecs: '3.2', endSecs: '4.5' },
-                confidence: .55
-            },
-
-
-        ]
-    };
-    const [transcriptCaptions, setTranscriptCaptions] = useState(data.speech_data);
+    const { 
+        id,
+        file_info: { 
+            uri, 
+            width: vid_width, 
+            height: vid_height, 
+            type: file_type
+        },
+        name, 
+        data: {
+            speech_data: {
+                words,
+                transcript
+            }
+        }
+    } = route.params.data; 
+    const [transcriptCaptions, setTranscriptCaptions] = useState(transcript);
     const [captionViews, setCaptionViews] = useState([]); 
     const [keywords, setKeywords] = useState([]);
     const [playBackTime, setPlayBackTime] = useState(0); 
-    const { 
-        name, date
-    } = route.params.data;
-
-
-    const file_info = { 
-        type:'video', 
-        uri: 'file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540anonymous%252Fwavely-e3e07459-e462-4db5-8544-e83bed15870e/ImagePicker/fca89a98-4784-4521-8a66-946cbe89ffbd.mp4'
-    };
     
     /*
     Custom hook that runs code before the initial render.
@@ -98,7 +82,7 @@ const TranscriptDetailsScreen = ({ route }) => {
     }); 
 
     /*
-    useEffect manages captionViews update calls
+    This useEffect manages captionViews update calls
     based on the state dependencies keywords and
     transcriptCaptions. onUnmounComponent cleans up.
     */
@@ -106,15 +90,20 @@ const TranscriptDetailsScreen = ({ route }) => {
         console.log('After render (useEffect)');
         var newCaptionViews = updateCaptionViews();
         setCaptionViews(newCaptionViews); 
-        return () => onUnmountComponent();
     }, [transcriptCaptions, keywords]);    
+
+    /* This useEffect cleans up after unmounting */
+    useEffect(() => {
+        return () => onUnmountComponent(); 
+    }); 
 
     /**
      * @description Clean up on component unmount
      */
     function onUnmountComponent() {
         console.log('On unmount component (details screen)...');
-        // save new transcript to database
+        // save new transcript to database (auto-save)
+
         // reset states 
         setCaptionViews(null);
         setTranscriptCaptions(null); 
@@ -127,14 +116,14 @@ const TranscriptDetailsScreen = ({ route }) => {
      */
     function initCaptionViews() { // create views (reuse them, show: true | false)
         console.log('Initializing caption views...')
-        const views = data.speech_data.map((transcript_obj, idx) => {
+        const views = transcriptCaptions.map((transcript_obj, idx) => {
             return (
                 <TranscriptCaptionItem
                     key={idx}
                     view_key={idx}
                     setPlayBackTime={setPlayBackTime}
                     captionObject={transcript_obj}
-                    onAltered={(idx, text) => { handleTranscriptCaption(idx, text) }}
+                    onSave={(idx, text) => { handleTranscriptCaption(idx, text) }}
                     show={true} // each will be shown
                 />
             );                
@@ -184,8 +173,8 @@ const TranscriptDetailsScreen = ({ route }) => {
             return key === idx? 
             {
                 ...captionObj, 
-                text: text, 
-                confidence: 1 // user has corrected flawed text (make green)
+                text: text 
+                // confidence: 1 
             } 
             : 
             {...captionObj};
@@ -225,12 +214,17 @@ const TranscriptDetailsScreen = ({ route }) => {
         return newCaptionViews;
     }
     
+    const exportTranscript = () => { 
+        console.log('Exporting transcript...');
+        const data_id = id; 
+    }
+
     return (
         <View style={styles.rootContainer}>
              <View style={styles.videoContainer}>
-                { (file_info.type === 'video' && file_info.uri) && 
+                { (file_type === 'video' && uri) && 
                 <Video
-                    source={{ uri: file_info.uri }}
+                    source={{ uri: uri }}
                     positionMillis={playBackTime}
                     rate={1.0}
                     volume={1.0}
@@ -243,10 +237,18 @@ const TranscriptDetailsScreen = ({ route }) => {
                 />
                 }
             </View>
-            <View style={styles.searchContainer}>
+            <View stlye={styles.transcriptContainer} >
                 <View style={styles.searchBar}>
                     <SearchBar onSubmit={setKeywords} />
                 </View>
+                {/* <View style={styles.transcriptToolBar}>    */}
+                    {/* <EditIcon.Button 
+                        size={25}
+                        name={isOpen ? 'menufold' : 'menuunfold' } 
+                        backgroundColor="#3b5998"
+                        onPress={() => { setIsEditable(true); }} 
+                    /> 
+                </View>              */}
                 <ScrollView 
                     style={styles.transcriptBody}
                     indicatorStyle='black'
@@ -255,8 +257,7 @@ const TranscriptDetailsScreen = ({ route }) => {
                 >
                 { captionViews }
                 </ScrollView>
-            </View> 
-
+            </View>
         </View>
     );
 };
@@ -265,16 +266,19 @@ const styles = StyleSheet.create({
     rootContainer: {
         flex: 1,
     },
-    searchContainer: {
-        flex: .6,
-        justifyContent: 'center',
-        alignContent: 'center'
-    },
     videoContainer: {
         flex: .4,
         margin: 10,
         borderWidth: 1,
         borderRadius: 3
+    },
+    transcriptContainer: {
+        flex: .6,
+        justifyContent: 'center',
+        alignContent: 'center'
+    },
+    transcriptToolBar: {
+        flex: .2,
     },
     transcriptBody: {
         flex: .80,
