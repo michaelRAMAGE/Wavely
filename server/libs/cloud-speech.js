@@ -73,7 +73,7 @@ module.exports = async (file_name) => {
     response_data.speech_data.push({ 
       words: words_times, 
       transcript: {
-        text: result.alternatives[0].trancript, 
+        text: result.alternatives[0].transcript, 
         time_span: {startSecs: start_time_transcript, endSecs: end_time_transcript}, 
         confidence: result.alternatives[0].confidence,
       }

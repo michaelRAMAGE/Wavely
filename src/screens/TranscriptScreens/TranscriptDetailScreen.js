@@ -25,7 +25,7 @@ e accounted for with show prop on TranscriptCaptionItem.
 /* 
 - Export to multiple platforms 
 - Send the document to email (basically the same as in TranscriptListScreen)
-- Throw error when video uri cannot be found
+- Throw error when video uri cannot be found --> 
 -- Should we also save videos to our database or ...?
 - set listener for updates 
 - base display on number of transcript chunks and words within each chunk.
@@ -40,6 +40,7 @@ import {
     Dimensions, 
     ScrollView,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { 
     SearchBar, 
     TranscriptCaptionItem, 
@@ -48,7 +49,9 @@ import {
 import { Video } from 'expo-av';
 
 const TranscriptDetailsScreen = ({ route }) => {
+    const navigation = useNavigation(); // use TranscriptStackNav navigation prop
     const { width, height } = Dimensions.get('window');
+
     const { 
         id,
         file_info: { 
@@ -59,17 +62,17 @@ const TranscriptDetailsScreen = ({ route }) => {
         },
         name, 
         data: {
-            speech_data: {
-                words,
-                transcript
-            }
+            audio_name,
+            speech_data
         }
-    } = route.params.data; 
-    const [transcriptCaptions, setTranscriptCaptions] = useState(transcript);
+    } = route.params?.data; 
+    const [transcriptCaptions, setTranscriptCaptions] = useState(
+        speech_data.map(object => object.transcript)
+    );
     const [captionViews, setCaptionViews] = useState([]); 
     const [keywords, setKeywords] = useState([]);
     const [playBackTime, setPlayBackTime] = useState(0); 
-    
+    const [test, setTest] = useState(null);
     /*
     Custom hook that runs code before the initial render.
     Sets initial captionViews state provided data via
@@ -78,7 +81,7 @@ const TranscriptDetailsScreen = ({ route }) => {
     useConstructor(() => {
         console.log('Before first render (useConstructor)');
         var views = initCaptionViews();
-        setCaptionViews((prevState => [...prevState, ...views]));
+        setCaptionViews(...captionViews, views);
     }); 
 
     /*
@@ -88,27 +91,14 @@ const TranscriptDetailsScreen = ({ route }) => {
     */
     useEffect(() => { 
         console.log('After render (useEffect)');
-        var newCaptionViews = updateCaptionViews();
-        setCaptionViews(newCaptionViews); 
+        updateCaptionViews();
     }, [transcriptCaptions, keywords]);    
 
-    /* This useEffect cleans up after unmounting */
-    useEffect(() => {
-        return () => onUnmountComponent(); 
-    }); 
-
-    /**
-     * @description Clean up on component unmount
-     */
-    function onUnmountComponent() {
-        console.log('On unmount component (details screen)...');
-        // save new transcript to database (auto-save)
-
-        // reset states 
-        setCaptionViews(null);
-        setTranscriptCaptions(null); 
-        setPlayBackTime(0);            
-    }
+    useEffect(()=> {
+        return () => { 
+            setPlayBackTime(0); 
+        }
+    },[])
 
     /**
      * @description Initializes captionViews state
@@ -116,15 +106,15 @@ const TranscriptDetailsScreen = ({ route }) => {
      */
     function initCaptionViews() { // create views (reuse them, show: true | false)
         console.log('Initializing caption views...')
-        const views = transcriptCaptions.map((transcript_obj, idx) => {
+        const views = transcriptCaptions.map((transcript_obj, view_idx) => {
             return (
                 <TranscriptCaptionItem
-                    key={idx}
-                    view_key={idx}
+                    key={view_idx}
+                    index={view_idx}
                     setPlayBackTime={setPlayBackTime}
-                    captionObject={transcript_obj}
-                    onSave={(idx, text) => { handleTranscriptCaption(idx, text) }}
-                    show={true} // each will be shown
+                    transcriptObject={transcript_obj}
+                    onSave={(index, text) => { handleTranscriptCaption(index, text) }}
+                    show={true} 
                 />
             );                
         }); 
@@ -167,19 +157,16 @@ const TranscriptDetailsScreen = ({ route }) => {
      * @param {Number} idx - index of a TranscriptCaptionItem 
      * @param {String} text - updated transcriptCaption state
      */
-    const handleTranscriptCaption = (idx, text) => { 
+    const handleTranscriptCaption = (update_index, new_transcriptObject) => { 
+        console.log(new_transcriptObject)
         console.log('Handling transcript caption update...')
-        var newCaptionObject = transcriptCaptions.map((captionObj, key) => {
-            return key === idx? 
-            {
-                ...captionObj, 
-                text: text 
-                // confidence: 1 
-            } 
+        var newCaptionObjects = transcriptCaptions.map((past_transcriptObject, curr_index) => {
+            return curr_index === update_index ? 
+            new_transcriptObject
             : 
-            {...captionObj};
+            past_transcriptObject;
         });
-        setTranscriptCaptions(newCaptionObject);
+        setTranscriptCaptions(newCaptionObjects)
     }
 
     /**
@@ -198,9 +185,8 @@ const TranscriptDetailsScreen = ({ route }) => {
     function updateCaptionViews() { // show: true | false
         console.log('Updating caption views...');
         var newCaptionViews = captionViews.map(view => {
-            var idx = parseInt(view.props.view_key); // use current key
+            var idx = parseInt(view.props.index); // use current key
             var transcriptCaption = transcriptCaptions[idx].text;
-            console.log(transcriptCaption)
             var new_view = {
                 ...view, 
                 props: {
@@ -211,7 +197,8 @@ const TranscriptDetailsScreen = ({ route }) => {
             }
             return new_view;
         });
-        return newCaptionViews;
+        setCaptionViews(newCaptionViews);
+        // return newCaptionViews;
     }
     
     const exportTranscript = () => { 
@@ -237,25 +224,16 @@ const TranscriptDetailsScreen = ({ route }) => {
                 />
                 }
             </View>
-            <View stlye={styles.transcriptContainer} >
+            <View style={styles.transcriptContainer} >
                 <View style={styles.searchBar}>
                     <SearchBar onSubmit={setKeywords} />
                 </View>
-                {/* <View style={styles.transcriptToolBar}>    */}
-                    {/* <EditIcon.Button 
-                        size={25}
-                        name={isOpen ? 'menufold' : 'menuunfold' } 
-                        backgroundColor="#3b5998"
-                        onPress={() => { setIsEditable(true); }} 
-                    /> 
-                </View>              */}
                 <ScrollView 
-                    style={styles.transcriptBody}
+                    style={styles.scrollView}
                     indicatorStyle='black'
                     persistentScrollbar={true}
-                    
                 >
-                { captionViews }
+                    { captionViews }
                 </ScrollView>
             </View>
         </View>
@@ -265,37 +243,36 @@ const TranscriptDetailsScreen = ({ route }) => {
 const styles = StyleSheet.create({
     rootContainer: {
         flex: 1,
+        marginHorizontal: 20,
     },
+
+    // same container 
     videoContainer: {
         flex: .4,
-        margin: 10,
+        marginTop: 10,
         borderWidth: 1,
-        borderRadius: 3
+        borderRadius: 3,
     },
     transcriptContainer: {
         flex: .6,
         justifyContent: 'center',
-        alignContent: 'center'
+        alignContent: 'center',
     },
-    transcriptToolBar: {
-        flex: .2,
-    },
-    transcriptBody: {
-        flex: .80,
-        marginHorizontal: 20,
-        borderWidth: 2,
-        borderRadius: 3,
-        backgroundColor: 'white',
-        padding: 5,
-        zIndex:1
 
-    },
+    // same container 
     searchBar: {
         flex: .2, 
-        minHeight: 30,
-        maxHeight: 50
+        minHeight: 50,
+        maxHeight: 50,
+        marginVertical: 5
     },
-
+    scrollView: {
+        flex: 1,
+        // borderWidth: 2,
+        // borderRadius: 3,
+        // backgroundColor: 'white',
+        padding: 5,
+    }
 });
 
 export default TranscriptDetailsScreen; 

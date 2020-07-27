@@ -6,13 +6,11 @@ import {
     Text
 } from 'react-native'; 
 
-// why did hasbeenaltered give trouble inside textinput onchangetext ?
-
 const TrancriptCaptionItem = (props) => {
     const { 
-        view_key: key, 
-        captionObject: {
-            text: text,
+        index,
+        transcriptObject: {
+            text,
             time_span: { 
                 startSecs,
                 endSecs
@@ -33,8 +31,15 @@ const TrancriptCaptionItem = (props) => {
         console.log('Altered...')
         setHasBeenAltered(false); // remove changes alert
         updateCaptionHistory([...captionHistory, currentCaption]); // add new item
-        setCaptionIdx(captionIdx++); // update idx for new item
-        onSave(key, currentCaption); // communicate change to details screen
+        var old_idx = captionIdx;
+        setCaptionIdx(old_idx++); // update idx for new item
+        onSave(index, 
+            {
+                time_span: { startSecs: startSecs, endSecs: endSecs}, 
+                confidence: 1, 
+                text: currentCaption
+            }
+        ); 
     }
 
     const getColor = (confidence) => { 
@@ -57,8 +62,8 @@ const TrancriptCaptionItem = (props) => {
     }
 
     return (
-        <View> 
-        { show ?
+        <>
+        { show &&
             <View 
                 style={{
                     flex: 1,
@@ -66,9 +71,7 @@ const TrancriptCaptionItem = (props) => {
                     flexDirection: 'row', 
                     padding: 8,
                     borderBottomWidth: 2,
-                    zIndex: -1}
-                } 
-                key={key}
+                }} 
             >
                 <View style={{flex: .5, paddingRight: 15}}>
                     <TextInput 
@@ -80,10 +83,9 @@ const TrancriptCaptionItem = (props) => {
                         multiline={true}
                         value={currentCaption}
                         onChangeText={(value) => { 
+                                setCurrentCaption(value);
                                 if (captionHistory[captionIdx] !== value) { 
-                                    console.log('caption: ', currentCaption)
-                                    setCurrentCaption(value);
-                                    setHasBeenAltered(true); 
+                                    setHasBeenAltered(true);
                                 }
                                 else { setHasBeenAltered(false); }
                             }
@@ -134,10 +136,8 @@ const TrancriptCaptionItem = (props) => {
                     </Text>                                                          
                 </TouchableHighlight>   
             </View>         
-        : 
-        <></>
         }
-        </View> 
+        </>
     );
 };
 

@@ -21,7 +21,6 @@ import styles from './styles';
 */
 
 const UploadScreen = ({state, navigation, descriptors, progress}) => {
-    console.log('in upload')
     const [isLoading, setIsLoading] = useState(false); // should cause rerender
     const [uploadStatus, setUploadStatus] = useState(false); // should cause rerender
     const [file, setFile] = useState({  // should cause rerender

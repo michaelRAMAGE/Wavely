@@ -47,20 +47,17 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         borderWidth: 1,
         borderRadius: 6,
-        margin: 10,
         borderColor: 'black',
         backgroundColor: 'white'
     },
     searchSpace: {
         flex: .9,
-        
     },
     submitSpace: {
         flex: .1,
     },
     textStyle: {
         flex: 1, 
-        padding: 5,
     },
 });
 

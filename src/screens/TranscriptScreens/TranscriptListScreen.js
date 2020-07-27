@@ -61,20 +61,29 @@ export default function TranscriptsListScreen ({ navigation }) {
         audio_name: 'testing_ui',
         speech_data: [
             {
-                text: 'Hello to you all!',
-                time_span: { startSecs: '17', endSecs: '1.5' },
-                confidence: .68
+                transcript: {
+                    text: 'Hello to you all!',
+                    time_span: { startSecs: '17', endSecs: '1.5' },
+                    confidence: .68
+                },
+                words: []
             },
             {
-                text: 'We will learn to code.',
-                time_span: { startSecs: '1.5', endSecs: '3.2' },
-                confidence: .9
+                transcript: {
+                    text: 'We will learn to code.',
+                    time_span: { startSecs: '1.5', endSecs: '3.2' },
+                    confidence: .9
+                },
+                words: []
             },
             {
-                text: 'Lets begin now',
-                time_span: { startSecs: '3.2', endSecs: '4.5' },
-                confidence: .55
-            },
+                transcript: {
+                    text: 'Lets begin now',
+                    time_span: { startSecs: '3.2', endSecs: '4.5' },
+                    confidence: .55
+                },
+                words: []
+            }
         ]
     };
     const TEST_DATA = [ 
@@ -84,9 +93,8 @@ export default function TranscriptsListScreen ({ navigation }) {
             name: 'test1',
             date: 'monday',
             data: {
-                words: data_captions[0],
-                transcript: data_captions[0]
-            } 
+                ...data_captions
+            }
         },
         { // do not rerender on transcript set
             id: Math.random().toString(),
@@ -94,9 +102,8 @@ export default function TranscriptsListScreen ({ navigation }) {
             name: 'test2',
             date: 'monday',
             data: {
-                words: data_captions[0],
-                transcript: data_captions[0]
-            } 
+                ...data_captions
+            }
         },
         { // do not rerender on transcript set
             id: Math.random().toString(),
@@ -104,9 +111,8 @@ export default function TranscriptsListScreen ({ navigation }) {
             name: 'test3',
             date: 'monday',
             data: {
-                words: data_captions[0],
-                transcript: data_captions[0]
-            } 
+                ...data_captions
+            }
         },
         { // do not rerender on transcript set
             id: Math.random().toString(),
@@ -114,15 +120,13 @@ export default function TranscriptsListScreen ({ navigation }) {
             name: 'test4',
             date: 'monday',
             data: {
-                words: data_captions[0],
-                transcript: data_captions[0]
-            } 
+                ...data_captions
+            }
         },
     ];
 
     const handleLoadPage = (item) => { // go to its details page 
-        navigation.navigate('TranscriptDetail', 
-        { name: 'TranscriptDetail',  data: item });
+        navigation.navigate('TranscriptDetail', { name: 'TranscriptDetail',  data: item });
     };
 
     const renderItem = ({ item }) => {

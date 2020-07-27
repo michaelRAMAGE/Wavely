@@ -7,10 +7,8 @@ import { useNavigation } from '@react-navigation/native';
 
 const TranscriptPageHeader = (props) => {
     const navigation = useNavigation(); // use TranscriptStackNav navigation prop
-    console.log(props.title)
     return (
         <View style={styles.headerContainer}>
-        {/* <> */}
             <View style={styles.leftSide} >
                 <TouchableHighlight 
                     style={styles.leftSideButton} 
@@ -26,7 +24,6 @@ const TranscriptPageHeader = (props) => {
                     </View>
                 </TouchableHighlight>
             </View>
-
             <View style={styles.middleSide}>
                 <Text style={styles.title}>{props.title}</Text>
             </View>
@@ -43,7 +40,6 @@ const TranscriptPageHeader = (props) => {
                     
                 </TouchableHighlight>
             </View>
-            {/* </> */}
         </View>
     );
 }
