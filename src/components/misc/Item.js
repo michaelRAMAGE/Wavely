@@ -7,7 +7,12 @@ import {
 from 'react-native';
 import ExportIcon from 'react-native-vector-icons/Entypo';
 
-
+/**
+ * @description An item to be rendered in Flatlist on TranscriptListScreen
+ * @param {*} item
+ * @param {*} onPress
+ * @param {*} style
+ */
 const Item = ({item, onPress, style}) => { 
     return (
         <TouchableOpacity onPress={onPress} style={style}>

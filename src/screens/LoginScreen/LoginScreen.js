@@ -1,23 +1,19 @@
-import { firebase } from '../../../server/firebase/config';
-// import user_functions from './user_functions.js';
+import { get_user } from '../../../server/firebase/functions/index';
 import React, { useState, useContext } from 'react'
-import { AuthContext } from '../../contexts/AuthContext';
+import { AuthContext } from '../../components/contexts/AuthContext';
 import { 
     Image, 
     Text, 
     TextInput, 
     TouchableOpacity, 
-    View } 
+    View, 
+    Alert} 
 from 'react-native'
 import { Loading } from '../../components/index'; 
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import styles from './styles';
 
 export default function LoginScreen({navigation}) {
-
-    // firebase // set login persistence
-    // .auth()
-    // .setPersistence(firebase.auth.Auth.Persistence.LOCAL); 
 
     const setUser = useContext(AuthContext);
     const [isLoading, setIsLoading] = useState(false);
@@ -30,34 +26,9 @@ export default function LoginScreen({navigation}) {
     
     const loginWithEmailPass = (email, password) => {
         setIsLoading(true);
-        firebase // login
-        .auth()
-        .signInWithEmailAndPassword(email, password)
-        .then((response) => {
-            const uid = response.user.uid;
-            firebase
-            .firestore().collection('users')
-            .doc(uid)
-            .get()
-            .then(firestoreDocument => {
-                if (!firestoreDocument.exists) {b 
-                    alert("User does not exist anymore.")
-                    return;
-                }
-                const user = firestoreDocument.data()
-                setIsLoading(false);
-                setUser(user);
-            
-            })
-            .catch(error => {
-                setIsLoading(false); 
-                alert(error)
-            });
-        })
-        .catch(error => {
-            setIsLoading(false);
-            alert(error)
-        })
+        const user = get_user(email, password);
+        setUser(user); 
+        setIsLoading(false); 
     }
 
     return ( 

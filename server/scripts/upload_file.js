@@ -8,7 +8,7 @@ module.exports = async (file_data) => {
     console.log(`Uploading file to server...${file_data}`);
     const { platform, kind, uri } = file_data; 
     const server = 'http://10.84.1.78:3000/';
-    const server_tunnel = 'http://f7ed1d754721.ngrok.io';
+    const server_tunnel = 'http://1064c6ff7d47.ngrok.io ';
     try {
         const formData = new FormData();
         formData.append('file', { // file to upload to server
@@ -26,9 +26,9 @@ module.exports = async (file_data) => {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
-        });
+        }).catch(err => { console.error(err) });
         return data; // response from axios post req
     }
-    catch (error) { console.error('Error: ', error) }
+    catch (err) { throw(err) }
 }
 

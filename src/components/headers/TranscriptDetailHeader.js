@@ -1,10 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableHighlight, Button } from 'react-native';
-import { useTitle } from '../misc/useTitle'; 
 import BackIcon from 'react-native-vector-icons/AntDesign' // arrow-back-circle
 import OptionIcon from 'react-native-vector-icons/SimpleLineIcons' // options
 import { useNavigation } from '@react-navigation/native';
 
+/**
+ * @description A header for TranscriptDetailsScreen
+ * @param {String} props.title - Title of page 
+ */
 const TranscriptPageHeader = (props) => {
     const navigation = useNavigation(); // use TranscriptStackNav navigation prop
     return (
@@ -31,7 +34,7 @@ const TranscriptPageHeader = (props) => {
                 <TouchableHighlight 
                     style={styles.rightSideButton} 
                     underlayColor='transparent'
-                    onPress={() => {alert('Open up options modal')}}
+                    onPress={() => { alert('Open up options modal')} }
                 >
                     <View>
                         <OptionIcon name='options' size={30} />

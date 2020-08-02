@@ -1,6 +1,15 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, Button } from 'react-native';
 
+/**
+ * @description An input box with clear and submit buttons
+ * @param {String} props.instructionText - Text that is displayed above
+ * TextInput container
+ * @param {String} props.inputPlaceholder - Placeholder text in input box
+ * @param {Function} props.onSubmit - A function that requires
+ * a keyword parameter to ~accept~ the text from the input when the submit 
+ * button is pressed.
+ */
 const KeywordInput = props => {
     const [keywords, setKeywords] = useState('');
     return ( 
@@ -17,14 +26,10 @@ const KeywordInput = props => {
                 <Button color='black' title='Clear' onPress={() => setKeywords('') } /> 
                 <Button color='black' title='Submit' 
                     onPress={() => { 
-                        if (keywords) { 
                             props.onSubmit(keywords); 
                             setKeywords('');
                         }
-                        else { 
-                            props.onSubmit(`Untitled_${Date.now()}`);
-                        }
-                    }}
+                    }
                 />
             </View>
         </View>
@@ -35,7 +40,7 @@ const styles = StyleSheet.create({
     keywordInputContainer: {
         flex: 1,
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
     },
     textInput: {
         fontSize: 20,

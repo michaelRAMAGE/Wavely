@@ -10,8 +10,6 @@ const styles = StyleSheet.create({
     videoContainer: {
         flex: 1,
         margin: 10,
-        borderWidth: 1,
-        borderRadius: 3
     }
 })
 export default styles; 

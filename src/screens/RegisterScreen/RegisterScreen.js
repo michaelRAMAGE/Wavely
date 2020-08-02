@@ -1,6 +1,6 @@
-import { firebase } from '../../../server/firebase/config';
+import { create_user } from '../../../server/firebase/functions/index';
 import React, { useState, useContext } from 'react'
-import { AuthContext } from '../../contexts/AuthContext';
+import { AuthContext } from '../../components/contexts/AuthContext';
 import { Image, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import styles from './styles';
@@ -19,30 +19,12 @@ export default function RegisterScreen({navigation}) {
     }
     
     const onRegisterPress = () => {
-        firebase // set login persistence
-        .auth()
-        .setPersistence(firebase.auth.Auth.Persistence.LOCAL); // Can I set this here?
-        if (password != confirmPassword) { alert('Passwords do not match.'); return; };
-        firebase
-            .auth()
-            .createUserWithEmailAndPassword(email, password)
-            .then((response) => {
-                const uid = response.user.uid;
-                const data = {
-                    id: uid,
-                    email,
-                    fullName,
-                };
-                const userRef = firebase.firestore().collection('users');
-                userRef.doc(uid)
-                    .set(data)
-                    .then(() => {
-                        // navigation.navigate('Home', {user: data}); // push, pop, popToTop
-                        setUser(data); // set parent state using context hook
-                    })
-                    .catch(error => alert(error));
-            })
-            .catch(error => alert(error));
+        if (password != confirmPassword) { 
+            alert('Passwords do not match.'); 
+            return; 
+        };
+        const user = create_user(email, password, fullName);
+        setUser(user); 
     }; 
     return (
         <View style={styles.container}>

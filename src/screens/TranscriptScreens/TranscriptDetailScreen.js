@@ -1,14 +1,12 @@
 /*
-TranscriptDetailScreen hosts
+About: TranscriptDetailScreen hosts
 specific data about a specific
 transcript. TranscriptListScreen 
 has a FlatList with items. When 
 an item is clicked, this page will
 be generated provided navigation 
 route parameter data. 
-*/
 
-/*
 Flow: When a captionObject's text changes on
 a TranscriptCaptionItem, TranscriptCaptionItem's
 onAltered prop function is called, which is set to
@@ -27,12 +25,9 @@ e accounted for with show prop on TranscriptCaptionItem.
 - Send the document to email (basically the same as in TranscriptListScreen)
 - Throw error when video uri cannot be found --> 
 -- Should we also save videos to our database or ...?
-- set listener for updates 
-- base display on number of transcript chunks and words within each chunk.
-- add trackable state for each chunk, revert to previous, or original
-- reduce code by not managing updates. deal with these in transcriptcaptionitem
 */
 
+import { firebase } from '../../../server/firebase/config';
 import React, { useState, useEffect } from 'react';
 import { 
     View, 
@@ -49,10 +44,9 @@ import {
 import { Video } from 'expo-av';
 
 const TranscriptDetailsScreen = ({ route }) => {
-    const navigation = useNavigation(); // use TranscriptStackNav navigation prop
     const { width, height } = Dimensions.get('window');
-
     const { 
+        key,
         id,
         file_info: { 
             uri, 
@@ -65,14 +59,14 @@ const TranscriptDetailsScreen = ({ route }) => {
             audio_name,
             speech_data
         }
-    } = route.params?.data; 
+    } = route.params.data; 
     const [transcriptCaptions, setTranscriptCaptions] = useState(
         speech_data.map(object => object.transcript)
     );
     const [captionViews, setCaptionViews] = useState([]); 
     const [keywords, setKeywords] = useState([]);
     const [playBackTime, setPlayBackTime] = useState(0); 
-    const [test, setTest] = useState(null);
+
     /*
     Custom hook that runs code before the initial render.
     Sets initial captionViews state provided data via
@@ -94,11 +88,40 @@ const TranscriptDetailsScreen = ({ route }) => {
         updateCaptionViews();
     }, [transcriptCaptions, keywords]);    
 
-    useEffect(()=> {
-        return () => { 
-            setPlayBackTime(0); 
-        }
-    },[])
+    /*
+    On unmountComponent
+    */
+    useEffect(()=> { return () => unmountDetailsScreen() }, []);
+
+    /**
+     * @description Update transcript document on database
+     */
+    const updateTranscript = () => { 
+        const user = firebase.auth().currentUser;
+        console.log(`Upload > current user: ${user}`);
+            if (user) {
+                console.log(`Updating transcript...: ${transcriptCaptions}`)
+                var unsubscribe = firebase.firestore()
+                        .collection('users')
+                        .doc(user.uid)
+                        .collection('transcripts')
+                        .doc(key)
+                        .update({'data.speech_data': transcriptCaptions}); 
+                return unsubscribe;
+            }
+            else {
+                throw new Error('Error: user is not recognized')
+            }
+    };   
+
+    /**
+     * @description Reset user induced states and save updates on exit
+     */
+    const unmountDetailsScreen = () => {
+        updateTranscript();
+        setPlayBackTime(0);
+        setKeywords([]);
+    };   
 
     /**
      * @description Initializes captionViews state
@@ -158,7 +181,6 @@ const TranscriptDetailsScreen = ({ route }) => {
      * @param {String} text - updated transcriptCaption state
      */
     const handleTranscriptCaption = (update_index, new_transcriptObject) => { 
-        console.log(new_transcriptObject)
         console.log('Handling transcript caption update...')
         var newCaptionObjects = transcriptCaptions.map((past_transcriptObject, curr_index) => {
             return curr_index === update_index ? 
@@ -198,14 +220,8 @@ const TranscriptDetailsScreen = ({ route }) => {
             return new_view;
         });
         setCaptionViews(newCaptionViews);
-        // return newCaptionViews;
     }
     
-    const exportTranscript = () => { 
-        console.log('Exporting transcript...');
-        const data_id = id; 
-    }
-
     return (
         <View style={styles.rootContainer}>
              <View style={styles.videoContainer}>
