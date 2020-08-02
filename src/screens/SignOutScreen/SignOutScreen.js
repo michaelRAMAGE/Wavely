@@ -1,7 +1,7 @@
-import { firebase } from '../../../server/firebase/config';
+import { signout_user } from '../../../server/firebase/functions/index';
 import React, { useState, useContext, useEffect } from 'react';
 import { View, StyleSheet, Button, Text, Modal } from 'react-native';
-import { AuthContext } from '../../contexts/AuthContext';
+import { AuthContext } from '../../components/contexts/AuthContext';
 
 // Things to do: 
 // Add this to drawer content inside homewscreen nav
@@ -9,21 +9,13 @@ import { AuthContext } from '../../contexts/AuthContext';
 export default function SignOutScreen ({navigation}) {
     const setUser = useContext(AuthContext); 
 
-    const handleSignOut = (b_confirm) => {
-        if (b_confirm) {
-            firebase
-            .auth()
-            .signOut()
-            .then(() => {  
-                console.log('User signed out'); 
-                setUser(null); // context -> authnav takes over
-            })
-            .catch(err => { throw(err) });   
-        } 
-        else { 
-            navigation.navigate('Upload');
+    const handleSignOut = (confirm) => {
+        if (confirm) {
+            signout_user();
+            setUser(null); 
         }
-    };
+    }
+    
     return ( 
         <View style={styles.rootContainer}>
             {/* <Modal 

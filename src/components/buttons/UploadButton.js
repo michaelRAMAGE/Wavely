@@ -5,7 +5,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 const UploadButton = (props) => {
     return (
         <TouchableOpacity onPress={props.onTouch}>
-            <View style={{...button_style.button,...props.style}}> 
+            <View style={{...button_style.button,...props.buttonStyle}}> 
                 <Text style={{...styles.buttonText,...props.textStyle}}>
                     {props.text}
                 </Text>

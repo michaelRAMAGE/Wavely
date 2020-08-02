@@ -1,96 +1,54 @@
-import { firebase } from '../../../server/firebase/config';
-import React, { useState, useContext, useEffect } from 'react';
+/*
+This screen hosts a user's transcripts.
+The transcripts are rendered in a FlatList.
+If a user clicks on an item in the FlatList
+(a transcript), they will be directed to 
+that transcript's TranscriptDetailScreen. 
+*/
+
+/*
+Issue: 
+
+Refreshing takes awhile.
+New transcript takes a while to appear.
+
+After updating file in database, opening it
+again does not give new, updated file. We will
+do a local update in the meantime. 
+This could have to do with listening on the
+specific document. 
+- This seems to be because update is not updating the
+doc. 
+*/
+import { load_all_transcripts } from '../../../server/firebase/functions/index';
+import React, { useState, useEffect } from 'react';
 import { 
     View, 
     StyleSheet,
     FlatList, 
-    SafeAreaView,
-    ActivityIndicator 
-} 
+    SafeAreaView } 
 from 'react-native';
-// import styles from './styles';
-import { AuthContext } from '../../contexts/AuthContext';
 import Item from '../../components/misc/Item';
+import { Loading } from '../../components';
 
-export default function TranscriptsListScreen ({navigation}) {
-    const setUser = useContext(AuthContext);  
+export default function TranscriptsListScreen ({ navigation }) {
     const [isLoading, setLoading] = useState(false);
     const [transcripts, setTranscripts] = useState([]);
     const [selectId, setSelectId] = useState(null);
-    useEffect(() => {    
-        firebase.firestore()
-                .collection('Users')
-                .doc(uid)
-                .collection('transcripts')
-                .onSnapshot(snapshot => {
-                    const transcripts = [];
-                    snapshot.forEach(transcript => {
-                        transcripts.push({
-                            ...transcript.data(),
-                            key: transcript.id,
-                        });
-                    });
-                    setTranscripts(transcripts);
-                    setLoading(false); 
-                });
-
+    
+    useEffect(() => { // Get transcripts
+        // var { transcripts, unsubscribe } = load_all_transcripts();
+        // setTranscripts(transcripts);
+        // return () => unsubscribe();
     },[]);
     
-    if (loading) { return <ActivityIndicator />}
-
-    const TEST_DATA = [
-        {
-            id: Math.random().toString(),
-            name: 'Title1',
-            date: 'monday',
-            time: '0:53',
-            transcript: 'hello my friend'
-
-        },
-        {
-            id: Math.random().toString(),
-            name: 'Title2',
-            date: 'tuesday',
-            time: '0:28',
-            transcript: 'welcome to my channel'
-        },
-        {
-            id: Math.random().toString(),
-            name: 'Title3',
-            date: 'wednesday',
-            time: '0:55',
-            transcript: 'today we will learn about cut vertices'
-        },
-        {
-            id: Math.random().toString(),
-            name: 'Title4',
-            date: 'monday',
-            time: '0:53',
-            transcript: 'hello my friend'
-
-        },
-        {
-            id: Math.random().toString(),
-            name: 'Title5',
-            date: 'tuesday',
-            time: '0:28',
-            transcript: 'welcome to my channel'
-        },
-        {
-            id: Math.random().toString(),
-            name: 'Title6',
-            date: 'wednesday',
-            time: '0:55',
-            transcript: 'today we will learn about cut vertices'
-        },
-    ];
-    const handleLoadPage = (item) => { // list item buttons
-        navigation.navigate('TranscriptDetail', 
-        { name: 'TranscriptDetail',  data: item }); // pass data on click
+    const handleLoadPage = (item) => { // go to its details page 
+        navigation.navigate('TranscriptDetail', { name: 'TranscriptDetail',  data: item });
     };
+
     const renderItem = ({ item }) => {
         return (
-            <Item 
+            <Item // manage presentation in Item.js
                 item={item}
                 onPress={() => { 
                     setSelectId(item.id); 
@@ -101,18 +59,22 @@ export default function TranscriptsListScreen ({navigation}) {
         );
     };
     return ( 
+        <>
+        <Loading visible={isLoading} />
         <View style={styles.rootContainer}>
             <SafeAreaView>
                 <FlatList
-                    data={TEST_DATA}
+                    data={transcripts}
                     renderItem={renderItem}
                     keyExtractor={(item) => item.id}
                     extraData={selectId}
                 />
             </SafeAreaView>
         </View>
+        </>
     );
 };
+
 const styles = StyleSheet.create({
     rootContainer: {
         flex: 1,

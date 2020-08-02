@@ -1,56 +1,42 @@
-import { firebase } from '../../../server/firebase/config';
-// import user_functions from './user_functions.js';
+import { get_user } from '../../../server/firebase/functions/index';
 import React, { useState, useContext } from 'react'
-import { AuthContext } from '../../contexts/AuthContext';
-import { Image, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { AuthContext } from '../../components/contexts/AuthContext';
+import { 
+    Image, 
+    Text, 
+    TextInput, 
+    TouchableOpacity, 
+    View, 
+    Alert} 
+from 'react-native'
+import { Loading } from '../../components/index'; 
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import styles from './styles';
 
 export default function LoginScreen({navigation}) {
-    console.log('logging in')
 
     const setUser = useContext(AuthContext);
-
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
+    const [isLoading, setIsLoading] = useState(false);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
 
     const onFooterLinkPress = () => {
-        navigation.navigate('Register')
+        navigation.navigate('Register');
     }
     
-    const onLoginPress = () => {
-        setUser('default') // for testing, switches away from authnav 
-        // firebase // set login persistence
-        // .auth()
-        // .setPersistence(firebase.auth.Auth.Persistence.LOCAL); // Can I set this here?
-        // firebase // login
-        // .auth()
-        // .signInWithEmailAndPassword(email, password)
-        // .then((response) => {
-        //     const uid = response.user.uid
-        //     const usersRef = firebase.firestore().collection('users')
-        //     usersRef
-        //         .doc(uid)
-        //         .get()
-        //         .then(firestoreDocument => {
-        //             if (!firestoreDocument.exists) {
-        //                 alert("User does not exist anymore.")
-        //                 return;
-        //             }
-        //             const user = firestoreDocument.data()
-        //             setUser(user);
-        //         })
-        //         .catch(error => {
-        //             alert(error)
-        //         });
-        // })
-        // .catch(error => {
-        //     alert(error)
-        // })
+    const loginWithEmailPass = (email, password) => {
+        setIsLoading(true);
+        const user = get_user(email, password);
+        setUser(user); 
+        setIsLoading(false); 
     }
 
-    return (
-        <View style={styles.container}>
+    return ( 
+        <>
+        { isLoading ? 
+        (<Loading visible={isLoading} />)
+        :
+        (<View style={styles.container}>
             <KeyboardAwareScrollView
                 style={{ flex: 1, width: '100%' }}
                 keyboardShouldPersistTaps="always">
@@ -79,13 +65,19 @@ export default function LoginScreen({navigation}) {
                 />
                 <TouchableOpacity
                     style={styles.button}
-                    onPress={() => onLoginPress()}>
+                    onPress={() => {
+                            // setUser(true);
+                            loginWithEmailPass(email, password)
+                        }
+                    }>
                     <Text style={styles.buttonTitle}>Log in</Text>
                 </TouchableOpacity>
                 <View style={styles.footerView}>
                     <Text style={styles.footerText}>Don't have an account? <Text onPress={onFooterLinkPress} style={styles.footerLink}>Sign up</Text></Text>
                 </View>
             </KeyboardAwareScrollView>
-        </View>
+        </View>)
+    }
+    </>
     )
 }

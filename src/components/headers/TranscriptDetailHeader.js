@@ -1,69 +1,82 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableHighlight, Button } from 'react-native';
 import BackIcon from 'react-native-vector-icons/AntDesign' // arrow-back-circle
 import OptionIcon from 'react-native-vector-icons/SimpleLineIcons' // options
+import { useNavigation } from '@react-navigation/native';
 
+/**
+ * @description A header for TranscriptDetailsScreen
+ * @param {String} props.title - Title of page 
+ */
 const TranscriptPageHeader = (props) => {
-    // header
-    // back button
-    // title
-    // export option
-        // email
-        // google docs
-        // ...more
-
+    const navigation = useNavigation(); // use TranscriptStackNav navigation prop
     return (
         <View style={styles.headerContainer}>
-            <View style={styles.leftSide}>
-                <BackIcon.Button 
-                    size={20}
-                    backgroundColor='black'
-                    name='fastbackward' 
-                    backgroundColor="#3b5998"
-                    onPress={props.backPress}
-                />
+            <View style={styles.leftSide} >
+                <TouchableHighlight 
+                    style={styles.leftSideButton} 
+                    underlayColor='transparent'
+                    onPress={() => navigation.navigate('TranscriptList')}
+                >
+                    <View>
+                        <BackIcon 
+                            name='fastbackward' 
+                            size={30} 
+                        />
+                        <Text>Back</Text>
+                    </View>
+                </TouchableHighlight>
             </View>
             <View style={styles.middleSide}>
-                <Text>{props.name}</Text>
+                <Text style={styles.title}>{props.title}</Text>
             </View>
             <View style={styles.rightSide}>
-                <OptionIcon.Button 
-                        size={20}
-                        backgroundColor='black'
-                        name='options'
-                        backgroundColor="#3b5998"
-                        onPress={props.optionPress}
-                />
+                <TouchableHighlight 
+                    style={styles.rightSideButton} 
+                    underlayColor='transparent'
+                    onPress={() => { alert('Open up options modal')} }
+                >
+                    <View>
+                        <OptionIcon name='options' size={30} />
+                        <Text>More</Text>
+                    </View>
+                    
+                </TouchableHighlight>
             </View>
         </View>
     );
 }
-
 const styles = StyleSheet.create({
-    rootContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignContent: 'center'
-    },
     headerContainer: {
-        // backgroundColor: 'blue',
-        flexDirection: 'row',
-        marginTop: 25
+        flexDirection: "row",
+        padding: 0,
+        backgroundColor: 'white'
     },
     leftSide: {
+        alignItems: 'flex-start',
         flex: .2,
-        // backgroundColor: 'white' 
+        // backgroundColor: 'green',
     },
     middleSide: {
-        flex: .6,
-        // backgroundColor: 'green',
         alignItems: 'center',
-        justifyContent: 'center'
-    },
-    rightSide: {
-        flex: .2,
+        justifyContent: 'center',
+        flex: .6,
         // backgroundColor: 'orange'
     },
+    rightSide: {
+        alignItems: 'flex-end',
+        flex: .2,
+        // backgroundColor: 'pink',
+    },
+    leftSideButton: {
+        marginLeft: 10
+    },
+    rightSideButton: {
+        marginRight: 10
+    },
+    title: {
+        fontSize: 20
+    }
 });
 
 export default TranscriptPageHeader; 

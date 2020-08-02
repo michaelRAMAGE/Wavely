@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Platform, 
-    ActivityIndicator, TouchableHighlight} from 'react-native';
+import { save_transcript } from '../../../server/firebase/functions/index';
+import { 
+    View, 
+    Text, 
+    StyleSheet, 
+    TouchableHighlight,
+
+} from 'react-native';
 import { Audio } from 'expo-av';
 import * as FileSystem from 'expo-file-system'; 
 import * as Permissions from 'expo-permissions';
-import KeywordInput from '../../components/misc/KeywordInput';
 import Icon from 'react-native-vector-icons/Entypo';
-import uploadFile from '../../../server/scripts/upload_file'
+import { withTranscript } from '../../components/index';
 
 const recordingOptions = {
     android: {
@@ -28,20 +33,51 @@ const recordingOptions = {
         linearPCMIsFloat: false,
     },
 };
-const RecordScreen = props => {
-    const [keyQuery, setKeyQuery] = useState('');    
-    const [recordingInstance, setRecordingInstance] = useState(null); // set recording instance
-    const [isRecording, setisRecording] = useState(false); 
-    const [isFetching, setFetching] = useState(false);
-    const [transcript, setTranscript] = useState(null);
 
+const RecordScreen = props => {  
+    const [recordingInstance, setRecordingInstance] = useState(null); 
+    const [duration, setDuration] = useState(null); 
+    const [isRecording, setisRecording] = useState(false); 
+    const {
+        handleFetch,
+        handleFile
+    } = props.handlers;
+    
+    useEffect(() => { handleDuration(); }); // update duration on recording 
+
+    /**
+     * @description Set and update recording duration during recording session
+     */
+    const handleDuration = async () => {
+        if (recordingInstance && isRecording) {
+            try {
+                var { durationMillis } = await recordingInstance.getStatusAsync();
+                var durationSeconds = durationMillis/1000;
+                var minutes = Math.floor(durationSeconds/60).toString();
+                var seconds_ms = (durationSeconds%60).toFixed(2).toString().split('.');
+                var seconds = seconds_ms[0];
+                var milliseconds = seconds_ms[1];
+                setDuration(`${minutes > 0 ? minutes + 'm' : ''} ${seconds}s ${milliseconds}`); 
+            }
+            catch (err) {
+                throw (err);
+            }
+        }
+    }
+
+    /**
+     * @description Begin recording, initializing recording instance.
+     * Note: Component must rerender before we can use recordingInstance.someInstanceMethod,
+     * so in startRecording we directly call methods through Audio.Recording() instance,
+     * instead of recordingInstance. Everywhere else we use recordingInstance. 
+     */
     const startRecording = async () => {      
         const { status, permissions } = await Permissions.askAsync(Permissions.AUDIO_RECORDING)
         if (status !== 'granted') {
             throw new Error('Audio recording permissions not granted. \
             You must grant these permissions to utilize our service. '); 
         } 
-        setisRecording(true); // set recording state
+        setisRecording(true); 
         const recording_instance = new Audio.Recording();
         try {
             await recording_instance.prepareToRecordAsync(recordingOptions);
@@ -49,19 +85,36 @@ const RecordScreen = props => {
         }
         catch (error) {
             stopRecording();
+            resetRecording();
             throw (error); 
         }
         setRecordingInstance(recording_instance); 
     }
+
+    /**
+     * @description Stop recording through call on recording instance
+     */
     const stopRecording = async () => {
         setisRecording(false);
         try {
+            const { durationMillis } = await recordingInstance.getStatusAsync;
+            const { uri } = await FileSystem.getInfoAsync(recordingInstance.getURI())
+            handleFile({
+                uri: uri,
+                duration: durationMillis,
+                type: 'audio',                
+            });
             await recordingInstance.stopAndUnloadAsync();
         }
         catch (error) {
+            resetRecording(); 
             throw(error);
         }
     }
+
+    /**
+     * @description Delete recording after intentional stop or on error.
+     */
     const deleteRecording = async () => {
         try {
             console.log('recording instance', recordingInstance)
@@ -72,36 +125,45 @@ const RecordScreen = props => {
             throw (error);
         }
     }
+
+    /**
+     * @description Reset recording 
+     */
     const resetRecording = () => {
         deleteRecording();
         setRecordingInstance(null);
     }
-    const fetchTranscripts = async () => {
-        setFetching(true); 
-        try {
-            const { uri } = await FileSystem.getInfoAsync(recordingInstance.getURI());
-            const file_data = {
-                platform: Platform.OS,
-                kind: 'audio',
-                uri: uri
-            }
-            const data = await uploadFile(file_data); 
-            // setTranscript(data.transcript); // response from our server
-        }
-        catch (error) {
-            console.log('error in fetch: ', error)
-            stopRecording();
-            resetRecording();
-        }
-        setFetching(false);
+
+    /**
+     * @description Reset up user-induced states
+     */
+    const resetStates = () => { 
+        setRecordingInstance(null);
+        setDuration(null);
+        setisRecording(false);
+    };   
+
+    // Call backs passed to HOC handleFetch function
+    const onNull = () => { 
+        Alert.alert('Transcript could not be generated from recording.');
+        resetStates();
     }
+    const onError = () => { resetStates(); }
+
     return ( 
+        <>
         <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
             {isRecording ? 
-            <TouchableHighlight onPress={()=> { stopRecording(); fetchTranscripts(); }}> 
-                <Icon name='controller-stop' size={40} color='red'>
-                    Stop
-                </Icon>
+            <TouchableHighlight onPress={() => { 
+                stopRecording(); 
+                handleFetch(onNull, onError);
+            }}>
+                <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                    <Icon name='controller-stop' size={40} color='red'>
+                        Stop
+                    </Icon>
+                    <Text style={{fontSize: 20}} >{duration}</Text>
+                </View>
             </TouchableHighlight>
             :
             <TouchableHighlight onPress={startRecording}>
@@ -111,14 +173,8 @@ const RecordScreen = props => {
             </TouchableHighlight>
             }   
         </View>
-
-
+        </>
     );
 };
 
-const styles = StyleSheet.create({
-
-});
-
-
-export default RecordScreen;
+export default withTranscript(RecordScreen);

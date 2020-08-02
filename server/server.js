@@ -36,7 +36,7 @@ app.post('/', (req, res, next) => {
             next(err)
             return;
         }
-        const { path, name, type } = files.file; console.log(path);
+        const { path, name, type } = files.file;
         const paths = {
             input: path,
             output: path.split('.')[0].toString() + '.wav'
