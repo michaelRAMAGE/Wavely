@@ -1,6 +1,6 @@
-import { get_user } from '../../../server/firebase/functions/index';
+import { get_user } from '../../../server/firebase/functions/index.js';
 import React, { useState, useContext } from 'react'
-import { AuthContext } from '../../components/contexts/AuthContext';
+import { AuthContext } from '../../components/index';
 import { 
     Image, 
     Text, 
@@ -15,19 +15,25 @@ import styles from './styles';
 
 export default function LoginScreen({navigation}) {
 
-    const setUser = useContext(AuthContext);
-    const [isLoading, setIsLoading] = useState(false);
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const setUser = useContext<AuthContext>(AuthContext);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [email, setEmail] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
 
     const onFooterLinkPress = () => {
         navigation.navigate('Register');
     }
     
-    const loginWithEmailPass = (email, password) => {
+    const loginWithEmailPass = async () => {
         setIsLoading(true);
-        const user = get_user(email, password);
-        setUser(user); 
+        const user_in = await get_user(email, password);
+        if (!user_in) {
+            setEmail('');
+            setPassword('');
+        }
+        else { 
+            setUser(user_in); 
+        }
         setIsLoading(false); 
     }
 
@@ -66,8 +72,7 @@ export default function LoginScreen({navigation}) {
                 <TouchableOpacity
                     style={styles.button}
                     onPress={() => {
-                            // setUser(true);
-                            loginWithEmailPass(email, password)
+                            loginWithEmailPass()
                         }
                     }>
                     <Text style={styles.buttonTitle}>Log in</Text>

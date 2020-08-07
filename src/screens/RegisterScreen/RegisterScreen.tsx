@@ -1,31 +1,33 @@
-import { create_user } from '../../../server/firebase/functions/index';
+import { create_user } from '../../../server/firebase/functions/index.js';
 import React, { useState, useContext } from 'react'
-import { AuthContext } from '../../components/contexts/AuthContext';
+import { AuthContext } from '../../components/index';
 import { Image, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import styles from './styles';
 
-
 export default function RegisterScreen({navigation}) {
-    const setUser = useContext(AuthContext);
+    const setUser = useContext<AuthContext>(AuthContext);
 
     const [fullName, setFullName] = useState('')
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
-    const [confirmPassword, setConfirmPassword] = useState('')
+    const [email, setEmail] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
+    const [confirmPassword, setConfirmPassword] = useState<string>('')
 
     const onFooterLinkPress = () => {
         navigation.navigate('Login')
     }
     
-    const onRegisterPress = () => {
+    const onRegisterPress = async () => {
         if (password != confirmPassword) { 
             alert('Passwords do not match.'); 
             return; 
-        };
-        const user = create_user(email, password, fullName);
-        setUser(user); 
-    }; 
+        }
+        else {
+            const user = create_user(email, password, fullName);
+            setUser(user); 
+        }
+    } 
+
     return (
         <View style={styles.container}>
             <KeyboardAwareScrollView
@@ -75,7 +77,7 @@ export default function RegisterScreen({navigation}) {
                 />
                 <TouchableOpacity
                     style={styles.button}
-                    onPress={() => onRegisterPress(setUser)}
+                    onPress={() => onRegisterPress()}
                 >
                     <Text style={styles.buttonTitle}>Create account</Text>
                 </TouchableOpacity>

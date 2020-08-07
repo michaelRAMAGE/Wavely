@@ -14,12 +14,12 @@ if (!global.btoa) { global.btoa = encode }
 if (!global.atob) { global.atob = decode }
 
 export default function App() {
-  const [user, setUser] = useState(true);
+  const [user, setUser] = useState(null);
 
   useConstructor(() => { // keep at top. runs once, on initial render
     console.log('In useConstructor at App.js')
-    const authSubscription = firebase.auth().onAuthStateChanged((user) => {
-      setUser(user);  
+    const authSubscription = firebase.auth().onAuthStateChanged((user_in) => {
+      setUser(user_in);  
       console.log('Found user. Setting user in App.js.');
     })
     return () => authSubscription(); 

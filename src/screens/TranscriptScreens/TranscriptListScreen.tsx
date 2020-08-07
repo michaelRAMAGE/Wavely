@@ -20,7 +20,7 @@ specific document.
 - This seems to be because update is not updating the
 doc. 
 */
-import { load_all_transcripts } from '../../../server/firebase/functions/index';
+import { load_all_transcripts } from '../../../server/firebase/functions/index.js';
 import React, { useState, useEffect } from 'react';
 import { 
     View, 
@@ -30,20 +30,22 @@ import {
 from 'react-native';
 import Item from '../../components/misc/Item';
 import { Loading } from '../../components';
+import { Transcript } from '../../types';
 
 export default function TranscriptsListScreen ({ navigation }) {
-    const [isLoading, setLoading] = useState(false);
-    const [transcripts, setTranscripts] = useState([]);
-    const [selectId, setSelectId] = useState(null);
-    
+    const [isLoading, setLoading] = useState<Boolean>(false);
+    const [transcripts, setTranscripts] = useState<Array<Transcript>>([]);
+    const [selectId, setSelectId] = useState<string>(null);
+
     useEffect(() => { // Get transcripts
-        // var { transcripts, unsubscribe } = load_all_transcripts();
-        // setTranscripts(transcripts);
-        // return () => unsubscribe();
+        console.log('[TranscriptListScreen:useEffect()] TranscriptListScreen render')
+        var f_clean = load_all_transcripts(setTranscripts);
+        return () => f_clean(); 
     },[]);
     
-    const handleLoadPage = (item) => { // go to its details page 
-        navigation.navigate('TranscriptDetail', { name: 'TranscriptDetail',  data: item });
+    const handleLoadPage = (item: Transcript) => { // go to its details page 
+        console.log('[TranscriptListScreen:handleLoadPage()] Loading page with following data: ', item)
+        navigation.navigate('TranscriptDetail', { page_data: item });
     };
 
     const renderItem = ({ item }) => {

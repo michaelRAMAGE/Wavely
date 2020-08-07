@@ -8,5 +8,7 @@ export { default as withTranscript } from './custom_hooks/withTranscript';
 export { default as SearchBar } from './misc/SearchBar';
 export { default as TranscriptDetailHeader } from './headers/TranscriptDetailHeader';
 export { default as MainHeader } from './headers/MainHeader';
-export { default as TranscriptCaptionItem } from './misc/TranscriptCaptionItem';
+export { default as TranscriptCaptionView } from './misc/TranscriptCaptionView';
 export { default as TranscriptNameModal } from './misc/TranscriptNameModal';
+export { default as AuthContext } from './contexts/AuthContext';
+export { default as HeaderContext } from './contexts/HeaderContext';

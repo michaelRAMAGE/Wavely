@@ -71,11 +71,9 @@ module.exports = async (file_name) => {
 
     // Data to return to server call to this function 
     response_data.speech_data.push({ 
-      transcript: {
         text: result.alternatives[0].transcript, 
         time_span: {startSecs: start_time_transcript, endSecs: end_time_transcript}, 
         confidence: result.alternatives[0].confidence,
-      }
     });
   });
   return response_data; 

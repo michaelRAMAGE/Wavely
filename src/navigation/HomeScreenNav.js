@@ -124,8 +124,6 @@ export const HomeNavigator = () => {
                 tabStyle: { marginTop: 30},
                 style: {},
                 showIcon: true,
-                // showLabel: false
-
             }}
         >
             <HomeTopNav.Screen
@@ -149,25 +147,20 @@ export const HomeNavigator = () => {
                     tabBarLabel: 'Upload'
                 }}
             />   
-
-            {/* <HomeTopNav.Screen
+            <HomeTopNav.Screen
                 name='SignOutNav'
                 component={SignOutScreen}
                 options={{
                     tabBarLabel: () => { return null },
                     tabBarIcon: () => { return <RunOutIcon size={30} name='exit-run' /> },
                     showIcon: true,
-                    
-  
                 }}
-            />                         */}
+            />                        
         </HomeTopNav.Navigator>
     );
 }
 
-const TranscriptNav = ({navigation, route}) => { // dynamic page loads
-    // console.log('navigation: ', navigation)
-    // console.log('route: ', route)
+const TranscriptNav = ({route}) => { // dynamic page loads
     return (
         <TranscriptStack.Navigator
             initialRoutName='TranscriptList'

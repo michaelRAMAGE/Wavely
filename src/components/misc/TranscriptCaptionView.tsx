@@ -6,10 +6,14 @@ import {
     Text
 } from 'react-native'; 
 
-const TrancriptCaptionItem = (props) => {
+/**
+ * @description 
+ * @param {*} props 
+ */
+const TrancriptCaptionView = (props) => {
     const { 
         index,
-        transcriptObject: {
+        transcriptCaption: {
             text,
             time_span: { 
                 startSecs,
@@ -21,34 +25,38 @@ const TrancriptCaptionItem = (props) => {
         onSave,
         setPlayBackTime
     } = props;  
-    const [captionHistory, updateCaptionHistory] = useState([text]); 
-    const [captionIdx, setCaptionIdx] = useState(0); 
-    const [currentCaption, setCurrentCaption] = useState(captionHistory[captionIdx]); 
-    const [hasBeenAltered, setHasBeenAltered] = useState(false); 
-    const [displayConfidence, setDisplayConfidence] = useState(true);
+    const [captionHistory, updateCaptionHistory] = useState<Array<string>>([text]); 
+    const [captionIdx, setCaptionIdx] = useState<number>(0); 
+    const [currentCaption, setCurrentCaption] = useState<string>(captionHistory[captionIdx]); 
+    const [hasBeenAltered, setHasBeenAltered] = useState<boolean>(false); 
+    const [displayConfidence, setDisplayConfidence] = useState<boolean>(true);
 
     const handleCaptionModification = () => { 
         console.log('Altered...')
         setHasBeenAltered(false); // remove changes alert
-        updateCaptionHistory([...captionHistory, currentCaption]); // add new item
+        updateCaptionHistory([...captionHistory, currentCaption]); // add new caption to captionHistory
         var old_idx = captionIdx;
-        setCaptionIdx(old_idx++); // update idx for new item
+        setCaptionIdx(old_idx++); // caption changed, added to captionHistory; update idx, set new currentCaption
         onSave(index, 
             {
                 time_span: { startSecs: startSecs, endSecs: endSecs}, 
-                confidence: 1, 
+                confidence: 1, // assume that user's change on caption improves confidence
                 text: currentCaption
             }
         ); 
     }
 
-    const getColor = (confidence) => { 
+    /**
+     * @description Determine color for caption text based on STT API confidence value 
+     * @param confidence - STT API's confidence on text prediction from speech
+     */
+    const getColor = (confidence: number): string => { 
         if (captionIdx === 0) { 
             confidence = confidence * 10 * 15
             var hsl = `hsl(${confidence}, 100%, 50%)`;
             return hsl; 
         }
-        else { return 1; } // user changed caption; assume improved over raw data
+        else { return 'hsl(100%, 100%, 50%)'; }
     }
 
     const handleUndo = () => { 
@@ -141,4 +149,4 @@ const TrancriptCaptionItem = (props) => {
     );
 };
 
-export default TrancriptCaptionItem; 
+export default TrancriptCaptionView; 

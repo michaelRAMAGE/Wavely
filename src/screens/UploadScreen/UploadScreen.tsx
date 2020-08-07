@@ -1,24 +1,25 @@
 import * as Permissions from 'expo-permissions';
 import * as ImagePicker from 'expo-image-picker';
-import React, { useState } from 'react';
-import { View, Modal, Alert } from 'react-native';
+import React from 'react';
+import { View, Alert } from 'react-native';
 import { 
     SelectButton, 
     UploadButton, 
     withTranscript 
 } from '../../components/index';
 import { Video } from 'expo-av';
-import _ from "lodash";
 import styles from './styles';
+import PropTypes from 'prop-types'; 
+import { TFile, ScreenProps } from '../../types';
 
-const UploadScreen = props => { 
+const UploadScreen: React.FC<ScreenProps> = ({ handlers, states }) => { 
     const {
         handleFetch,
-        handleFile
-    } = props.handlers;
+        handleFile,
+    } = handlers;
     const {
         file
-    } = props.states;
+    } = states;
 
     const pickVideo = async () => { 
         try {
@@ -28,8 +29,13 @@ const UploadScreen = props => {
                 aspect: [4, 3],
                 quality: 1,
             });
-            if (!result.cancelled) {
-                return result;
+            if (result.cancelled === false) {
+                handleFile({
+                    uri: result.uri, 
+                    width: result.height,
+                    height: result.width,
+                    type: result.type
+                }); 
             }
         } 
         catch (err) {
@@ -40,11 +46,10 @@ const UploadScreen = props => {
     const handleLoadCameraRoll = async function () { 
         const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
         if (status !== 'granted') { 
-            throw new Error('Camera roll permission not granted ):');
+            throw new Error('Camera roll permission not granted');
         }
         else {
-            const videoFile = await pickVideo();
-            handleFile(videoFile); 
+            await pickVideo();
         }
     }; 
     
@@ -98,4 +103,22 @@ const UploadScreen = props => {
         </>
     );
 };
+
+
+// UploadScreen.propTypes = {
+//     handlers: PropTypes.shape({
+//         handleFetch: PropTypes.func.isRequired,
+//         handleFile: PropTypes.func.isRequired,
+//         handleUploadStatus: PropTypes.func,
+//         handleIsLoadingh: PropTypes.func,
+//     }),
+//     states: PropTypes.shape({
+//         transcript: PropTypes.any,
+//         file: PropTypes.TFile.isRequired,
+//         isLoading: PropTypes.bool,
+//         uploadStatus: PropTypes.bool,
+//     }),
+//     navigation: PropTypes.any
+// }
+
 export default withTranscript(UploadScreen);

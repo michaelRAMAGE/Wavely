@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { save_transcript } from '../../../server/firebase/functions/index';
+import { save_transcript } from '../../../server/firebase/functions/index.js';
 import { 
     View, 
     Text, 
     StyleSheet, 
     TouchableHighlight,
+    Alert
 
 } from 'react-native';
 import { Audio } from 'expo-av';
@@ -12,6 +13,7 @@ import * as FileSystem from 'expo-file-system';
 import * as Permissions from 'expo-permissions';
 import Icon from 'react-native-vector-icons/Entypo';
 import { withTranscript } from '../../components/index';
+import { TFile, Transcript } from '../../types';
 
 const recordingOptions = {
     android: {
@@ -34,16 +36,33 @@ const recordingOptions = {
     },
 };
 
-const RecordScreen = props => {  
-    const [recordingInstance, setRecordingInstance] = useState(null); 
-    const [duration, setDuration] = useState(null); 
-    const [isRecording, setisRecording] = useState(false); 
+type ScreenProps = { // Valid props for screen
+    handlers: {
+        handleFetch: Function,
+        handleFile: Function,
+        handleUploadStatus: Function | undefined | null,
+        handleIsLoading: Function | undefined | null,
+    },
+    states: {
+        file: TFile
+        transcript: Transcript | undefined | null,
+        isLoading: Boolean | undefined | null,
+        uploadStatus: Boolean | undefined | null,        
+    }
+}
+
+const RecordScreen: React.FC<ScreenProps> = ({ handlers, states }) => {  
+    const [recordingInstance, setRecordingInstance] = useState<Audio.Recording | null>(null); 
+    const [duration, setDuration] = useState<String | null>(null); 
+    const [isRecording, setisRecording] = useState<Boolean>(false); 
     const {
         handleFetch,
         handleFile
-    } = props.handlers;
+    } = handlers;
     
-    useEffect(() => { handleDuration(); }); // update duration on recording 
+    useEffect(() => { 
+        handleDuration();
+    }); // update duration on recording 
 
     /**
      * @description Set and update recording duration during recording session
@@ -53,7 +72,7 @@ const RecordScreen = props => {
             try {
                 var { durationMillis } = await recordingInstance.getStatusAsync();
                 var durationSeconds = durationMillis/1000;
-                var minutes = Math.floor(durationSeconds/60).toString();
+                var minutes = Math.floor(durationSeconds/60);
                 var seconds_ms = (durationSeconds%60).toFixed(2).toString().split('.');
                 var seconds = seconds_ms[0];
                 var milliseconds = seconds_ms[1];
@@ -97,11 +116,11 @@ const RecordScreen = props => {
     const stopRecording = async () => {
         setisRecording(false);
         try {
-            const { durationMillis } = await recordingInstance.getStatusAsync;
+            const status: Audio.RecordingStatus = await recordingInstance.getStatusAsync();
             const { uri } = await FileSystem.getInfoAsync(recordingInstance.getURI())
             handleFile({
                 uri: uri,
-                duration: durationMillis,
+                duration: status.durationMillis,
                 type: 'audio',                
             });
             await recordingInstance.stopAndUnloadAsync();

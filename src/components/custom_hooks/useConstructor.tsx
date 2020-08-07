@@ -7,8 +7,8 @@ componentWillMount)
 */
 import React, { useState } from 'react';
 
-const useConstructor = (callback) => {
-    const [constructorHasRun, setConstructorHasRun] = useState(false);
+const useConstructor = (callback: Function) => {
+    const [constructorHasRun, setConstructorHasRun] = useState<Boolean>(false);
     if (constructorHasRun) return;
     const clean_up = callback(); 
     if (clean_up) { // unsubscribe, reset states, etc...

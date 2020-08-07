@@ -8,7 +8,7 @@ be generated provided navigation
 route parameter data. 
 
 Flow: When a captionObject's text changes on
-a TranscriptCaptionItem, TranscriptCaptionItem's
+a TranscriptCaptionView, TranscriptCaptionView's
 onAltered prop function is called, which is set to
 handleTranscriptCaption() in this component. When
 this function is called, setTranscriptCaption is
@@ -17,7 +17,7 @@ by useEffect (look in its dependencies). Following
 the dependency change, updateCaptionViews is called
 and the new text is merged, and if any keywords have
 been entered for filtering on the captions, those will
-e accounted for with show prop on TranscriptCaptionItem.
+e accounted for with show prop on TranscriptCaptionView.
 */
 
 /* 
@@ -27,7 +27,7 @@ e accounted for with show prop on TranscriptCaptionItem.
 -- Should we also save videos to our database or ...?
 */
 
-import { firebase } from '../../../server/firebase/config';
+import { update_transcript } from '../../../server/firebase/functions/index.js';
 import React, { useState, useEffect } from 'react';
 import { 
     View, 
@@ -38,34 +38,32 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { 
     SearchBar, 
-    TranscriptCaptionItem, 
+    TranscriptCaptionView, 
     useConstructor
 } from '../../components/index';
 import { Video } from 'expo-av';
+import { Caption } from '../../types';
 
-const TranscriptDetailsScreen = ({ route }) => {
+const TranscriptDetailScreen = ({ route }) => {
     const { width, height } = Dimensions.get('window');
     const { 
         key,
         id,
         file_info: { 
-            uri, 
-            width: vid_width, 
-            height: vid_height, 
+            uri: file_uri, 
+            width: vid_width, // if video, available to use on <Video>
+            height: vid_height, // if video, available to use <Video>
             type: file_type
         },
-        name, 
-        data: {
-            audio_name,
+        response_data: {
             speech_data
-        }
-    } = route.params.data; 
-    const [transcriptCaptions, setTranscriptCaptions] = useState(
-        speech_data.map(object => object.transcript)
-    );
-    const [captionViews, setCaptionViews] = useState([]); 
-    const [keywords, setKeywords] = useState([]);
-    const [playBackTime, setPlayBackTime] = useState(0); 
+        },
+        data
+    } = route.params.page_data; 
+    const [transcriptCaptions, setTranscriptCaptions] = useState<Array<Caption>>(speech_data);
+    const [captionViews, setCaptionViews] = useState<Array<TranscriptCaptionView>>([]); 
+    const [keywords, setKeywords] = useState<Array<string>>([]);
+    const [playBackTime, setPlayBackTime] = useState<number>(0); 
 
     /*
     Custom hook that runs code before the initial render.
@@ -73,9 +71,8 @@ const TranscriptDetailsScreen = ({ route }) => {
     navigation route parameter. 
     */
     useConstructor(() => {
-        console.log('Before first render (useConstructor)');
         var views = initCaptionViews();
-        setCaptionViews(...captionViews, views);
+        setCaptionViews([...captionViews, views]);
     }); 
 
     /*
@@ -84,7 +81,6 @@ const TranscriptDetailsScreen = ({ route }) => {
     transcriptCaptions. onUnmounComponent cleans up.
     */
     useEffect(() => { 
-        console.log('After render (useEffect)');
         updateCaptionViews();
     }, [transcriptCaptions, keywords]);    
 
@@ -94,101 +90,85 @@ const TranscriptDetailsScreen = ({ route }) => {
     useEffect(()=> { return () => unmountDetailsScreen() }, []);
 
     /**
-     * @description Update transcript document on database
-     */
-    const updateTranscript = () => { 
-        const user = firebase.auth().currentUser;
-        console.log(`Upload > current user: ${user}`);
-            if (user) {
-                console.log(`Updating transcript...: ${transcriptCaptions}`)
-                var unsubscribe = firebase.firestore()
-                        .collection('users')
-                        .doc(user.uid)
-                        .collection('transcripts')
-                        .doc(key)
-                        .update({'data.speech_data': transcriptCaptions}); 
-                return unsubscribe;
-            }
-            else {
-                throw new Error('Error: user is not recognized')
-            }
-    };   
-
-    /**
      * @description Reset user induced states and save updates on exit
      */
     const unmountDetailsScreen = () => {
-        updateTranscript();
+        update_transcript(key, transcriptCaptions);
         setPlayBackTime(0);
         setKeywords([]);
     };   
 
     /**
      * @description Initializes captionViews state
-     * @returns TranscriptCaptionItem[]
+     * @returns an initial array to set captionViews state
      */
-    function initCaptionViews() { // create views (reuse them, show: true | false)
-        console.log('Initializing caption views...')
-        const views = transcriptCaptions.map((transcript_obj, view_idx) => {
+    function initCaptionViews(): Array<TranscriptCaptionView> { 
+        // create views (reuse them, show: true | false)
+        console.log('[TranscriptDetailScreen:initCaptionViews] Initializing caption views...')
+        const initial_caption_views = transcriptCaptions.map((transcriptCaption, view_idx) => {
             return (
-                <TranscriptCaptionItem
-                    key={view_idx}
-                    index={view_idx}
+                <TranscriptCaptionView
+                    key={view_idx} // react expects this but this should not be read or modified
+                    index={view_idx} // this, instead of key, is used for modifications and updates
                     setPlayBackTime={setPlayBackTime}
-                    transcriptObject={transcript_obj}
-                    onSave={(index, text) => { handleTranscriptCaption(index, text) }}
+                    transcriptCaption={transcriptCaption}
+                    onSave={(index: number, caption: Caption) => {
+                         handleTranscriptCaption(index, caption);
+                    }}
                     show={true} 
                 />
             );                
         }); 
-        return views;
+        return initial_caption_views;
     };
 
     /**
-     * @description Search TranscriptListItem for keywords
-     * @param {Array} keyword_list 
-     * keywords to search for in rendered TranscriptListItems
-     * @param {String} captionText - a TranscriptListItem's text
-     * @returns {boolean} true: keyword found in TranscriptListItem's text
+     * @description Iterate over keywords and check if atleast one
+     * appears in a given captionText
+     * @param captionText - a specific Caption's text
      */
-    const keysInTranscript = (keyword_list, captionText) => { 
-        return keyword_list.some((keyword) => { 
+    const kwInCaptionText = (captionText: string): boolean => { 
+        return keywords.some((keyword: string) => { 
             return captionText.toLowerCase().includes(keyword.toLowerCase());
         });
     };
 
     /**
-     * @description 
-     *  Sets show={true|false} prop on a TranscriptCaptionItem.
-     *  A user searches all rendered TranscriptCaptionItems
-     *  using a set of keywords. All TranscriptCaptionItems 
-     *  containing a keyword in the keyword_list will have their
-     *  show prop set to true. 
-     * @param {String} captionText - a TranscriptCaptionItem's text 
-     * @returns {Boolean} true: show respective TranscriptCaptionItem
+     * @description To display or to not, that is the question. 
+     * Used for setting show prop on TranscriptCaptionView to true or false.
+     * @param captionText - a specific Caption's text
      */
-    const viewShouldShow = (captionText) => { // show: true | false
+    const viewShouldShow = (captionText: string): boolean => { 
         if (keywords.length !== 0) {
-            var keyword_list = keywords.replace(/\s+/g,'').split(',');
-            return keysInTranscript(keyword_list, captionText);
+            return kwInCaptionText(captionText);
         }
         else { return true };          
     }
 
     /**
-     * @description Merge old transcriptCaptions with new tramscriptCaptions
-     * @param {Number} idx - index of a TranscriptCaptionItem 
-     * @param {String} text - updated transcriptCaption state
+     * @description Handler passed to onSubmit prop of <SearchBar> component. 
+     * @param {string} s_keywords - <SearchBar> passes string of keywords onSubmit
      */
-    const handleTranscriptCaption = (update_index, new_transcriptObject) => { 
-        console.log('Handling transcript caption update...')
-        var newCaptionObjects = transcriptCaptions.map((past_transcriptObject, curr_index) => {
+    const handleSearchKW = (s_keywords: string) => {
+        var keyword_list = s_keywords.replace(/\s+/g,'').split(',');
+        setKeywords(keyword_list);
+    }
+
+    /**
+     * @description Merge old transcriptCaptions with new transcriptCaptions
+     * @param update_index - Index of a modified Caption in transcriptCaptions
+     * @param newTranscriptCaption - New Caption to replace old Caption
+     */
+    const handleTranscriptCaption = (update_index: number, newTranscriptCaption: Caption) => { 
+        console.log('[TranscriptDetailScreen:handleTranscriptCaption] \
+        Handling transcript caption update...');
+        var newTranscriptCaptions = transcriptCaptions.map((pastTranscriptCaption, curr_index) => {
             return curr_index === update_index ? 
-            new_transcriptObject
+            newTranscriptCaption
             : 
-            past_transcriptObject;
+            pastTranscriptCaption;
         });
-        setTranscriptCaptions(newCaptionObjects)
+        setTranscriptCaptions(newTranscriptCaptions)
     }
 
     /**
@@ -196,10 +176,10 @@ const TranscriptDetailsScreen = ({ route }) => {
      *  Set/merge new captionViews after changing
      *  transcriptCaptions or keywords. 
      *  transcriptCaptions is updated when
-     *  a TranscriptCaptionItem is altered
+     *  a TranscriptCaptionView is altered
      *  and then the changes are saved. 
      *  keywords is updated when a user searches
-     *  for TranscriptCaptionItems that contain
+     *  for TranscriptCaptionViews that contain
      *  certain keywords; the matching TranscriptListItems
      *  will be shown via boolean value show prop. 
      * @returns TranscriptListItem[]
@@ -208,6 +188,7 @@ const TranscriptDetailsScreen = ({ route }) => {
         console.log('Updating caption views...');
         var newCaptionViews = captionViews.map(view => {
             var idx = parseInt(view.props.index); // use current key
+            console.log('Transcript captions: ', transcriptCaptions)
             var transcriptCaption = transcriptCaptions[idx].text;
             var new_view = {
                 ...view, 
@@ -225,9 +206,9 @@ const TranscriptDetailsScreen = ({ route }) => {
     return (
         <View style={styles.rootContainer}>
              <View style={styles.videoContainer}>
-                { (file_type === 'video' && uri) && 
+                { (file_type === 'video' && file_uri) && 
                 <Video
-                    source={{ uri: uri }}
+                    source={{ uri: file_uri }}
                     positionMillis={playBackTime}
                     rate={1.0}
                     volume={1.0}
@@ -242,7 +223,7 @@ const TranscriptDetailsScreen = ({ route }) => {
             </View>
             <View style={styles.transcriptContainer} >
                 <View style={styles.searchBar}>
-                    <SearchBar onSubmit={setKeywords} />
+                    <SearchBar onSubmit={handleSearchKW} />
                 </View>
                 <ScrollView 
                     style={styles.scrollView}
@@ -291,4 +272,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default TranscriptDetailsScreen; 
+export default TranscriptDetailScreen; 

@@ -1,18 +1,18 @@
 import { signout_user } from '../../../server/firebase/functions/index';
-import React, { useState, useContext, useEffect } from 'react';
-import { View, StyleSheet, Button, Text, Modal } from 'react-native';
-import { AuthContext } from '../../components/contexts/AuthContext';
-
-// Things to do: 
-// Add this to drawer content inside homewscreen nav
+import React, { useContext } from 'react';
+import { View, StyleSheet, Button, Text } from 'react-native';
+import { AuthContext } from '../../components/index';
 
 export default function SignOutScreen ({navigation}) {
-    const setUser = useContext(AuthContext); 
+    const setUser = useContext<AuthContext>(AuthContext); 
 
-    const handleSignOut = (confirm) => {
+    const handleSignOut = (confirm: boolean) => {
         if (confirm) {
             signout_user();
             setUser(null); 
+        }
+        else {
+            navigation.navigate('UploadNav')
         }
     }
     
@@ -29,8 +29,8 @@ export default function SignOutScreen ({navigation}) {
                         Are you sure you want to sign out?
                     </Text>
                     <View style={styles.buttonContainer}> 
-                        <Button color='#788eec' title='Yes' onPress={() => handleSignOut(1)} />
-                        <Button color='#788eec' title='No' onPress={() => handleSignOut(0)} />
+                        <Button color='#788eec' title='Yes' onPress={() => handleSignOut(true)} />
+                        <Button color='#788eec' title='No' onPress={() => handleSignOut(false)} />
                     </View>
                 </View>
             {/* </Modal> */}

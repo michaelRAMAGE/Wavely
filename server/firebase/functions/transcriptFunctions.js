@@ -12,9 +12,33 @@
 import { firebase } from '../config';
 
 /**
+ * @description Update existing transcript
+ */
+export const updateTranscript = (key, transcriptCaptions) => { // tested (good)
+    console.log('[updateTranscript:18] updateTranscript called')
+    const user = firebase.auth().currentUser;
+    console.log(`Upload > current user: ${user}`);
+        if (user) {
+            console.log(`Updating transcript...: ${transcriptCaptions}`)
+            var unsubscribe = firebase.firestore()
+                    .collection('users')
+                    .doc(user.uid)
+                    .collection('transcripts')
+                    .doc(key)
+                    .update({'data.speech_data': transcriptCaptions}); 
+            return unsubscribe;
+        }
+        else {
+            throw new Error('Error: user is not recognized')
+        }
+};  
+
+
+/**
  * @description Save transcript to database
 */
 export const saveTranscript = (transcript) => { // save to database
+    console.log('[saveTranscript:40] saveTranscript called')
     try {
         const user = firebase.auth().currentUser;
         console.log(`Upload > current user: ${user}`);
@@ -38,37 +62,33 @@ export const saveTranscript = (transcript) => { // save to database
  * TranscriptListScreen.
  * @returns {Object} { transcript_list, unsubscribe }
  */
-export const getAllTranscripts = () => {
-    console.log('Render action (TranscripListScreen)')
-    const transcript_list = [];
-    var unsubscribe = () => {};
+export const getAllTranscripts =  (transcriptState) => { // tested (good)
+    console.log('[transcriptFunctions:64] load_all_transcripts called')
     var user = firebase.auth().currentUser;
-    if (user) { // Get transcripts from database
-        const subscribe = firebase.firestore()
+    if (user) {
+        var transcript_list = [];  
+        const unsubscribe = firebase.firestore()
                 .collection('users')
                 .doc(user.uid)
                 .collection('transcripts')
                 .onSnapshot(snapshot => {
-                    if (!snapshot.empty) { // Access documents within snapshot
-                        const temp_list = []
+                    if (!snapshot.empty) { 
+                        var temp_list = []
                         snapshot.forEach(transcript => {
-                            console.log('transcript: ', transcript);
-                            temp_list.push({
+                            temp_list.push({                               
                                 ...transcript.data(),
-                                key: transcript.id,
-                            });
-                        }); 
+                                key: transcript.id})
+                            } 
+                        );
                         transcript_list = temp_list; 
+                        transcriptState(transcript_list)
                     }
-                    else {
-                        console.log('There are no transcripts to retrieve.');
-                    }
-                });
-        unsubscribe = subscribe; 
+                    else { console.log('There are no transcripts')}
+                }, (err => { throw(err) })); 
+        return unsubscribe; 
     }
-    else { console.log('User not recognized.')}
-    return { transcripts: transcript_list, unsubscribe: unsubscribe};
-
+    else { throw new Error('User should be logged in, but firebase says otherwise. \
+    (transcriptFunctions.js:90)') }
 }
 
-export const getTranscript = () => {}; 
+
