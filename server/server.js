@@ -7,13 +7,8 @@ a script that handles the form data's file.
 This file is then fed into get_transcript(),
 an export from get_transcript.js. If no error,
 we obtain a transcript to send back to client. 
-
-Error: 
-When using nodemon for nodejs server, cannot send post
-to ngrok tunnel for localhost. In other words, this api
-endpoints are not reached. When using node to run server,
-endpoints are reached. 
 */
+require('dotenv').config();
 const express = require('express');
 const formidable = require('formidable');
 const get_transcript = require('./scripts/get_transcript'); 
@@ -47,6 +42,6 @@ app.post('/', (req, res, next) => {
     });
 }); 
 
-app.listen(3000, () => {
+app.listen(process.env.PORT, () => {
     console.log('Server is running on port 3000');
 });

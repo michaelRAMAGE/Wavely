@@ -3,11 +3,11 @@ This file houses Google Cloud Storage config info.
 Google Cloud Storage is used to store large audio
 files to be converted into transcripts.
 */
+require('dotenv').config();
 const {Storage} = require('@google-cloud/storage');
 
-const bucketName = 'gs://wavely-1593222928316.appspot.com';
-const storage = new Storage({keyFilename: '/home/ramage/projects/Wavely/wavely/wavely-1593222928316-527b86c62251.json'});
-// const storage = new Storage({keyFilename: "key.json"});
+const bucketName = process.env.FB_storageBucket;
+const storage = new Storage({keyFilename: process.env.API_KEY_FILE_NAME});
 
 module.exports = (filename) => {
     console.log('In cloud-storage.js...');
