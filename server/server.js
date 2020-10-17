@@ -8,7 +8,7 @@ This file is then fed into get_transcript(),
 an export from get_transcript.js. If no error,
 we obtain a transcript to send back to client. 
 */
-require('dotenv').config();
+// require('dotenv').config();
 const express = require('express');
 const formidable = require('formidable');
 const get_transcript = require('./scripts/get_transcript'); 
@@ -42,6 +42,6 @@ app.post('/', (req, res, next) => {
     });
 }); 
 
-app.listen(process.env.PORT, () => {
+app.listen(3000, () => {
     console.log('Server is running on port 3000');
 });

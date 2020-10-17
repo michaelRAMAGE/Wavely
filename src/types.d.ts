@@ -16,17 +16,18 @@ export interface ScreenProps { // Valid props for screen
     }
 }
 
+
 /* File data */
 export interface TFile {
     uri: string,
     duration: number,
     width?: number,
-    height?: number,
+    height?: number, 
     type: string
 }
 
 /* Captions for the transcript */
-export interface Caption {
+export interface Caption { 
     text: string,
     time_span: {
         startSecs: number,

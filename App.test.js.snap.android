@@ -1,0 +1,180 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Login /> should match snapshot 1`] = `
+<View
+  style={
+    Object {
+      "alignItems": "center",
+      "flex": 1,
+    }
+  }
+>
+  <RCTScrollView
+    automaticallyAdjustContentInsets={false}
+    contentInset={
+      Object {
+        "bottom": 0,
+      }
+    }
+    enableAutomaticScroll={true}
+    enableOnAndroid={false}
+    enableResetScrollToCoords={true}
+    extraHeight={75}
+    extraScrollHeight={0}
+    getScrollResponder={[Function]}
+    handleOnScroll={[Function]}
+    keyboardDismissMode="interactive"
+    keyboardOpeningTime={250}
+    keyboardShouldPersistTaps="always"
+    keyboardSpace={0}
+    onScroll={[Function]}
+    resetKeyboardSpace={[Function]}
+    scrollEventThrottle={1}
+    scrollForExtraHeightOnAndroid={[Function]}
+    scrollIntoView={[Function]}
+    scrollToEnd={[Function]}
+    scrollToFocusedInput={[Function]}
+    scrollToPosition={[Function]}
+    showsVerticalScrollIndicator={true}
+    style={
+      Object {
+        "flex": 1,
+        "width": "100%",
+      }
+    }
+    update={[Function]}
+    viewIsInsideTabBar={false}
+  >
+    <View>
+      <Image
+        source={1}
+        style={
+          Object {
+            "alignSelf": "center",
+            "flex": 1,
+            "height": 120,
+            "margin": 30,
+            "width": 90,
+          }
+        }
+      />
+      <TextInput
+        allowFontScaling={true}
+        autoCapitalize="none"
+        onChangeText={[Function]}
+        placeholder="E-mail"
+        placeholderTextColor="#aaaaaa"
+        rejectResponderTermination={true}
+        style={
+          Object {
+            "backgroundColor": "white",
+            "borderRadius": 5,
+            "height": 48,
+            "marginBottom": 10,
+            "marginLeft": 30,
+            "marginRight": 30,
+            "marginTop": 10,
+            "overflow": "hidden",
+            "paddingLeft": 16,
+          }
+        }
+        underlineColorAndroid="transparent"
+        value=""
+      />
+      <TextInput
+        allowFontScaling={true}
+        autoCapitalize="none"
+        onChangeText={[Function]}
+        placeholder="Password"
+        placeholderTextColor="#aaaaaa"
+        rejectResponderTermination={true}
+        secureTextEntry={true}
+        style={
+          Object {
+            "backgroundColor": "white",
+            "borderRadius": 5,
+            "height": 48,
+            "marginBottom": 10,
+            "marginLeft": 30,
+            "marginRight": 30,
+            "marginTop": 10,
+            "overflow": "hidden",
+            "paddingLeft": 16,
+          }
+        }
+        underlineColorAndroid="transparent"
+        value=""
+      />
+      <View
+        accessible={true}
+        focusable={true}
+        isTVSelectable={true}
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "alignItems": "center",
+            "backgroundColor": "#788eec",
+            "borderRadius": 5,
+            "height": 48,
+            "justifyContent": "center",
+            "marginLeft": 30,
+            "marginRight": 30,
+            "marginTop": 20,
+            "opacity": 1,
+          }
+        }
+      >
+        <Text
+          style={
+            Object {
+              "color": "white",
+              "fontSize": 16,
+              "fontWeight": "bold",
+            }
+          }
+        >
+          Log in
+        </Text>
+      </View>
+      <View
+        style={
+          Object {
+            "alignItems": "center",
+            "flex": 1,
+            "marginTop": 20,
+          }
+        }
+      >
+        <Text
+          style={
+            Object {
+              "color": "#2e2e2d",
+              "fontSize": 16,
+            }
+          }
+        >
+          Don't have an account? 
+          <Text
+            onPress={[Function]}
+            style={
+              Object {
+                "color": "#788eec",
+                "fontSize": 16,
+                "fontWeight": "bold",
+              }
+            }
+          >
+            Sign up
+          </Text>
+        </Text>
+      </View>
+    </View>
+  </RCTScrollView>
+</View>
+`;

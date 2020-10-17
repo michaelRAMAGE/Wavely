@@ -35,18 +35,20 @@ export const getUser = async (email, password) => { // tested (good)
         }
         return null;
     });
-    var firestoreDocument = await firebase
-    .firestore()
-    .collection("users")
-    .doc(response.user.uid)
-    .get()
-    .catch(err => { throw(err) });
-    if (!firestoreDocument.exists) {
-        Alert.alert("Cannot find a user with those credentials");
-        return null;
-    } 
-    else {
-        return firestoreDocument.data();
+    if (response) {
+        var firestoreDocument = await firebase
+        .firestore()
+        .collection("users")
+        .doc(response.user.uid)
+        .get()
+        .catch(err => { throw(err) });
+        if (!firestoreDocument.exists) {
+            Alert.alert("Cannot find a user with those credentials");
+            return null;
+        } 
+        else {
+            return firestoreDocument.data();
+        }
     }
     
 };
@@ -82,12 +84,13 @@ export const createUser = async (email, password, fullName) => {
         email,
         fullName,
     };
-    // Note: user will not resolve when offline 
-    const user = await firebase.firestore()
-        .collection("users").doc(uid).set(data)
-        .catch(err => { alert(err); return null;  }); 
-    return user;
-    
+    if (response) { 
+        // Note: user will not resolve when offline 
+        const user = await firebase.firestore()
+            .collection("users").doc(data.id).set(data)
+            .catch(err => { alert(err); return null;  }); 
+        return user;
+    }
 };
 
 /**

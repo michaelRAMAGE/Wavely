@@ -10,5 +10,5 @@ export { default as TranscriptDetailHeader } from './headers/TranscriptDetailHea
 export { default as MainHeader } from './headers/MainHeader';
 export { default as TranscriptCaptionView } from './misc/TranscriptCaptionView';
 export { default as TranscriptNameModal } from './misc/TranscriptNameModal';
-export { default as AuthContext } from './contexts/AuthContext';
+export { AuthContext } from './contexts/AuthContext';
 export { default as HeaderContext } from './contexts/HeaderContext';

@@ -33,27 +33,37 @@ import { Loading } from '../../components';
 import { Transcript } from '../../types';
 
 export default function TranscriptsListScreen ({ navigation }) {
-    const [isLoading, setLoading] = useState<Boolean>(false);
+    const [isLoading, setLoading] = useState<Boolean>(false); // load screen until transcripts loaded in 
     const [transcripts, setTranscripts] = useState<Array<Transcript>>([]);
     const [selectId, setSelectId] = useState<string>(null);
 
-    useEffect(() => { // Get transcripts
+    /**
+     * Load transcripts from user's profile in database and set them to be rendered in list view
+     */
+    useEffect(() => { // could use custom useConstructor() hook for initialization before first render
         console.log('[TranscriptListScreen:useEffect()] TranscriptListScreen render')
         var f_clean = load_all_transcripts(setTranscripts);
         return () => f_clean(); 
     },[]);
     
-    const handleLoadPage = (item: Transcript) => { // go to its details page 
-        console.log('[TranscriptListScreen:handleLoadPage()] Loading page with following data: ', item)
-        navigation.navigate('TranscriptDetail', { page_data: item });
+    /**
+     * @description load a single transcript's details screen 
+     * @param transcript a single transcript from a user's list of transcripts 
+     */
+    const handleLoadPage = (transcript: Transcript) => { // go to its details page 
+        console.log('[TranscriptListScreen:handleLoadPage()] Loading page with following data: ', transcript)
+        navigation.navigate('TranscriptDetail', { page_data: transcript });
     };
 
+    /**
+     * @description build flat list of user transcript
+     */
     const renderItem = ({ item }) => {
         return (
             <Item // manage presentation in Item.js
                 item={item}
                 onPress={() => { 
-                    setSelectId(item.id); 
+                    setSelectId(item.id); // forget what this. i think it is useless
                     handleLoadPage(item);
                 }} // create custom page
                 style={styles.item}
@@ -62,14 +72,14 @@ export default function TranscriptsListScreen ({ navigation }) {
     };
     return ( 
         <>
-        <Loading visible={isLoading} />
+        <Loading visible={isLoading} /> 
         <View style={styles.rootContainer}>
             <SafeAreaView>
                 <FlatList
                     data={transcripts}
                     renderItem={renderItem}
-                    keyExtractor={(item) => item.id}
-                    extraData={selectId}
+                    keyExtractor={(item) => item.id} // consistent ids for user transcripts (used for react caching and reordering)
+                    extraData={selectId} // rerender when selectId state changes
                 />
             </SafeAreaView>
         </View>

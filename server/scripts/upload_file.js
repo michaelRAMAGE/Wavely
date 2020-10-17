@@ -2,13 +2,13 @@
 This file houses an upload function for client video/audio
 file uploads to our server.
 */
-require('dotenv').config();
+// require('dotenv').config();
 const axios = require('axios'); 
-
+const UPLOAD_SERVER = "http://81226f9163f1.ngrok.io"
 module.exports = async (file_data) => {
     console.log(`Uploading file to server...${file_data}`);
     const { platform, kind, uri } = file_data; 
-    const server = process.env.UPLOAD_SERVER;
+    const server = UPLOAD_SERVER;
     try {
         const formData = new FormData();
         formData.append('file', { // file to upload to server

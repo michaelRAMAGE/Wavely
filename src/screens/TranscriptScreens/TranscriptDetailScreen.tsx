@@ -44,15 +44,21 @@ import {
 import { Video } from 'expo-av';
 import { Caption } from '../../types';
 
+/**
+ * @description This component represents the page for an entire
+ * transcripion file. This component contains TranscriptCaptionView
+ * subcomponents to present each line of the transcription file, allowing
+ * for editing, line by line confidence indicators, and more. 
+ */
 const TranscriptDetailScreen = ({ route }) => {
     const { width, height } = Dimensions.get('window');
     const { 
         key,
         id,
-        file_info: { 
+        file_info: { // file info
             uri: file_uri, 
-            width: vid_width, // if video, available to use on <Video>
-            height: vid_height, // if video, available to use <Video>
+            width: vid_width, // if type video, then available to use on <Video>
+            height: vid_height, // if type video, then available to use <Video>
             type: file_type
         },
         response_data: {
@@ -61,7 +67,7 @@ const TranscriptDetailScreen = ({ route }) => {
         data
     } = route.params.page_data; 
     const [transcriptCaptions, setTranscriptCaptions] = useState<Array<Caption>>(speech_data);
-    const [captionViews, setCaptionViews] = useState<Array<TranscriptCaptionView>>([]); 
+    const [captionViews, setCaptionViews] = useState([]); 
     const [keywords, setKeywords] = useState<Array<string>>([]);
     const [playBackTime, setPlayBackTime] = useState<number>(0); 
 
@@ -72,7 +78,7 @@ const TranscriptDetailScreen = ({ route }) => {
     */
     useConstructor(() => {
         var views = initCaptionViews();
-        setCaptionViews([...captionViews, views]);
+        setCaptionViews([...captionViews, views]); // set the captions so they can be displayed
     }); 
 
     /*
@@ -102,7 +108,7 @@ const TranscriptDetailScreen = ({ route }) => {
      * @description Initializes captionViews state
      * @returns an initial array to set captionViews state
      */
-    function initCaptionViews(): Array<TranscriptCaptionView> { 
+    function initCaptionViews() { 
         // create views (reuse them, show: true | false)
         console.log('[TranscriptDetailScreen:initCaptionViews] Initializing caption views...')
         const initial_caption_views = transcriptCaptions.map((transcriptCaption, view_idx) => {

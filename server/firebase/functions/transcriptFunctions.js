@@ -15,7 +15,7 @@ import { firebase } from '../config';
  * @description Update existing transcript
  */
 export const updateTranscript = (key, transcriptCaptions) => { // tested (good)
-    console.log('[updateTranscript:18] updateTranscript called')
+    console.log('[transcriptFunctions] updateTranscript called')
     const user = firebase.auth().currentUser;
     console.log(`Upload > current user: ${user}`);
         if (user) {
@@ -38,7 +38,7 @@ export const updateTranscript = (key, transcriptCaptions) => { // tested (good)
  * @description Save transcript to database
 */
 export const saveTranscript = (transcript) => { // save to database
-    console.log('[saveTranscript:40] saveTranscript called')
+    console.log('[transcriptFunctions] saveTranscript called')
     try {
         const user = firebase.auth().currentUser;
         console.log(`Upload > current user: ${user}`);
@@ -63,8 +63,8 @@ export const saveTranscript = (transcript) => { // save to database
  * @returns {Object} { transcript_list, unsubscribe }
  */
 export const getAllTranscripts =  (transcriptState) => { // tested (good)
-    console.log('[transcriptFunctions:64] load_all_transcripts called')
-    var user = firebase.auth().currentUser;
+    console.log('[transcriptFunctions] load_all_transcripts called')
+    const user = firebase.auth().currentUser;
     if (user) {
         var transcript_list = [];  
         const unsubscribe = firebase.firestore()
@@ -77,7 +77,7 @@ export const getAllTranscripts =  (transcriptState) => { // tested (good)
                         snapshot.forEach(transcript => {
                             temp_list.push({                               
                                 ...transcript.data(),
-                                key: transcript.id})
+                                key: transcript.id}) 
                             } 
                         );
                         transcript_list = temp_list; 
@@ -87,8 +87,7 @@ export const getAllTranscripts =  (transcriptState) => { // tested (good)
                 }, (err => { throw(err) })); 
         return unsubscribe; 
     }
-    else { throw new Error('User should be logged in, but firebase says otherwise. \
-    (transcriptFunctions.js:90)') }
+    return () => {} 
 }
 
 

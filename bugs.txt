@@ -1,0 +1,15 @@
+The bug concerns performing a react state update on an umounted component. 
+1. Create account
+2. Log out of account 
+3. Log in, cannot perform a react state update on an unmounted component.
+When merely logging in, this did not trigger the warning. 
+On another run, f_clean is not a function is called be undefined
+
+If user logs back in, it takes them back to last visited page. 
+1. Login
+2. Sign out
+3. Login
+The result is that the individual will be returned to the sign out page
+
+
+

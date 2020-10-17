@@ -8,7 +8,8 @@ import { Transcript, ResponseData, TFile, ScreenProps} from '../../types';
 
 /**
  * @description Underlying state-management for components
- * that set a file to be sent to server to STT API
+ * that set a file to be sent to server to STT API.
+ * Takes component as argument and equips it with state. 
  */
 const withTranscript = (Component: React.ComponentType<any & ScreenProps>) => {
     const transcriptWrapper = (props: any) => {

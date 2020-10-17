@@ -1,8 +1,12 @@
 /**
  * @description This function calls STT API and receives data 
- * to return to server, which is then provided to our user. 
+ * to return to server, which is then provided to our user. account
 */
-require('dotenv').config();
+// require('dotenv').config();
+
+const API_KEY_FILE_NAME="/home/ramage/projects/Wavely/wavely/wavely-1593222928316-527b86c62251.json"
+const FB_storageBucket="gs://wavely-1593222928316.appspot.com"
+
 const speech = require('@google-cloud/speech').v1p1beta1;
 const fs = require('fs');
 
@@ -11,7 +15,7 @@ module.exports = async (file_name) => {
   console.log(`Filename: ${file_name}`);
 
   // Cloud storage for audio files 
-  const bucket_name = process.env.FB_storageBucket;
+  const bucket_name = FB_storageBucket;
   const cloud_storage_loc = bucket_name + '/' + file_name; 
 
     // Configuration 
@@ -22,7 +26,7 @@ module.exports = async (file_name) => {
     sampleRateHertz: 16000,
     enableAutomaticPunctuation: true,
   }
-  const client = new speech.SpeechClient({keyFilename: process.env.API_KEY_FILE_NAME}); // Creates a client
+  const client = new speech.SpeechClient({keyFilename: API_KEY_FILE_NAME}); // Creates a client
   const audio = { uri: cloud_storage_loc }; // Retrieve from cloud storage
   const request = {
     audio: audio,

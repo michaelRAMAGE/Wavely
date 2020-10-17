@@ -6,8 +6,8 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import styles from './styles';
 
 export default function RegisterScreen({navigation}) {
-    const setUser = useContext<AuthContext>(AuthContext);
 
+    const setUser: React.Dispatch<any> = useContext(AuthContext);
     const [fullName, setFullName] = useState('')
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
@@ -23,8 +23,10 @@ export default function RegisterScreen({navigation}) {
             return; 
         }
         else {
-            const user = create_user(email, password, fullName);
-            setUser(user); 
+            const user = await create_user(email, password, fullName);
+            if (user) { 
+                setUser(user);
+            } 
         }
     } 
 

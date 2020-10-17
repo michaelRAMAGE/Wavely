@@ -5,10 +5,15 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "eject": "expo eject"
+    "eject": "expo eject",
+    "test": "jest"
+  },
+  "jest": {
+    "preset": "jest-expo/android"
   },
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.0.20",
+    "@firebase/auth": "^0.14.9",
     "@google-cloud/speech": "^4.1.0",
     "@google-cloud/storage": "^5.1.1",
     "@react-native-community/cameraroll": "^4.0.0",
@@ -24,7 +29,6 @@
     "axios": "^0.19.2",
     "base-64": "^0.1.0",
     "cors": "^2.8.5",
-    "dotenv": "^8.2.0",
     "expo": "~37.0.3",
     "expo-av": "~8.1.0",
     "expo-file-system": "~8.1.0",
@@ -36,6 +40,8 @@
     "fluent-ffmpeg": "^2.1.2",
     "formidable": "^1.2.2",
     "fs": "^0.0.1-security",
+    "jest": "^26.4.2",
+    "jest-expo": "^38.0.2",
     "react": "~16.9.0",
     "react-dom": "~16.9.0",
     "react-native": "https://github.com/expo/react-native/archive/sdk-37.0.1.tar.gz",
@@ -57,6 +63,7 @@
     "@types/react-dom": "^16.9.8",
     "@types/react-native": "^0.63.2",
     "babel-preset-expo": "~8.1.0",
+    "react-native-testing-library": "^6.0.0",
     "typescript": "^3.9.7"
   },
   "private": true

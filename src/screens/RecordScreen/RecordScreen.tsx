@@ -13,7 +13,7 @@ import * as FileSystem from 'expo-file-system';
 import * as Permissions from 'expo-permissions';
 import Icon from 'react-native-vector-icons/Entypo';
 import { withTranscript } from '../../components/index';
-import { TFile, Transcript } from '../../types';
+import { ScreenProps } from '../../types';
 
 const recordingOptions = {
     android: {
@@ -36,36 +36,28 @@ const recordingOptions = {
     },
 };
 
-type ScreenProps = { // Valid props for screen
-    handlers: {
-        handleFetch: Function,
-        handleFile: Function,
-        handleUploadStatus: Function | undefined | null,
-        handleIsLoading: Function | undefined | null,
-    },
-    states: {
-        file: TFile
-        transcript: Transcript | undefined | null,
-        isLoading: Boolean | undefined | null,
-        uploadStatus: Boolean | undefined | null,        
-    }
-}
-
-const RecordScreen: React.FC<ScreenProps> = ({ handlers, states }) => {  
+const RecordScreen: React.FC<ScreenProps> = ({ handlers }) => {  
     const [recordingInstance, setRecordingInstance] = useState<Audio.Recording | null>(null); 
     const [duration, setDuration] = useState<String | null>(null); 
     const [isRecording, setisRecording] = useState<Boolean>(false); 
-    const {
-        handleFetch,
-        handleFile
-    } = handlers;
     
+    /**
+     * Handlers passed from higher order component withTranscript.
+     * View HOC for more information on possible handlers and states.
+     */ 
+    const {
+        handleFetch, // look at withTranscript HOC for possible arguments
+        handleFile // takes TFile as argument
+    } = handlers; 
+    
+
     useEffect(() => { 
         handleDuration();
     }); // update duration on recording 
 
     /**
-     * @description Set and update recording duration during recording session
+     * @description Set and update recording duration during recording session.
+     * This helps render a recording duration view while recording via setDuration state. 
      */
     const handleDuration = async () => {
         if (recordingInstance && isRecording) {
@@ -96,15 +88,14 @@ const RecordScreen: React.FC<ScreenProps> = ({ handlers, states }) => {
             throw new Error('Audio recording permissions not granted. \
             You must grant these permissions to utilize our service. '); 
         } 
-        setisRecording(true); 
+        setisRecording(true); // will start chain of duration updating
         const recording_instance = new Audio.Recording();
         try {
             await recording_instance.prepareToRecordAsync(recordingOptions);
             await recording_instance.startAsync();
         }
         catch (error) {
-            stopRecording();
-            resetRecording();
+            stopRecording(); // redirect to stop recording
             throw (error); 
         }
         setRecordingInstance(recording_instance); 
@@ -115,7 +106,7 @@ const RecordScreen: React.FC<ScreenProps> = ({ handlers, states }) => {
      */
     const stopRecording = async () => {
         setisRecording(false);
-        try {
+        try { // try to stop and pass file to HOC handler handleFile for server upload
             const status: Audio.RecordingStatus = await recordingInstance.getStatusAsync();
             const { uri } = await FileSystem.getInfoAsync(recordingInstance.getURI())
             handleFile({
@@ -124,9 +115,10 @@ const RecordScreen: React.FC<ScreenProps> = ({ handlers, states }) => {
                 type: 'audio',                
             });
             await recordingInstance.stopAndUnloadAsync();
+            resetStates(); // then reset states
         }
-        catch (error) {
-            resetRecording(); 
+        catch (error) { // otherwise throw error and restart process
+            resetRecording(); // delete recording and reset states
             throw(error);
         }
     }
@@ -150,7 +142,7 @@ const RecordScreen: React.FC<ScreenProps> = ({ handlers, states }) => {
      */
     const resetRecording = () => {
         deleteRecording();
-        setRecordingInstance(null);
+        resetStates();
     }
 
     /**
@@ -159,7 +151,6 @@ const RecordScreen: React.FC<ScreenProps> = ({ handlers, states }) => {
     const resetStates = () => { 
         setRecordingInstance(null);
         setDuration(null);
-        setisRecording(false);
     };   
 
     // Call backs passed to HOC handleFetch function
@@ -181,7 +172,7 @@ const RecordScreen: React.FC<ScreenProps> = ({ handlers, states }) => {
                     <Icon name='controller-stop' size={40} color='red'>
                         Stop
                     </Icon>
-                    <Text style={{fontSize: 20}} >{duration}</Text>
+                    <Text style={{fontSize: 20}}> {duration} </Text>
                 </View>
             </TouchableHighlight>
             :

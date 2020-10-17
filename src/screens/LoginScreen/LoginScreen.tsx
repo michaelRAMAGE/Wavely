@@ -1,5 +1,5 @@
 import { get_user } from '../../../server/firebase/functions/index.js';
-import React, { useState, useContext } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import { AuthContext } from '../../components/index';
 import { 
     Image, 
@@ -15,7 +15,7 @@ import styles from './styles';
 
 export default function LoginScreen({navigation}) {
 
-    const setUser = useContext<AuthContext>(AuthContext);
+    const setUser: React.Dispatch<any> = useContext(AuthContext);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
@@ -23,7 +23,9 @@ export default function LoginScreen({navigation}) {
     const onFooterLinkPress = () => {
         navigation.navigate('Register');
     }
-    
+    useEffect(() => {
+        return () => { console.log('Unmounting component')}
+    })
     const loginWithEmailPass = async () => {
         setIsLoading(true);
         const user_in = await get_user(email, password);
@@ -32,6 +34,7 @@ export default function LoginScreen({navigation}) {
             setPassword('');
         }
         else { 
+            console.log('Updating state')
             setUser(user_in); 
         }
         setIsLoading(false); 
